@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">GitDroid</string>
+    <string name="text_general_github_my_user_account">marcc992</string>
+    <string name="text_general_app_description">Searching repositories from GitHub has never been so easy.\n\nYou just need to put an actual username below an press on Get Repos!</string>
+    <string name="button_get_repos">Get Repos!</string>
 </resources>
