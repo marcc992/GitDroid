@@ -1,0 +1,2 @@
+rootProject.name='GitDroid'
+include ':app'
