@@ -1,11 +1,14 @@
 package es.marcmauri.gitdroid.github.searchuser;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import es.marcmauri.gitdroid.github.GitUserViewModel;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class GitSearchUserPresenter implements GitSearchUserMVP.Presenter {
 
@@ -35,30 +38,41 @@ public class GitSearchUserPresenter implements GitSearchUserMVP.Presenter {
                 view.showProgress();
             }
 
-            new DummyAsyncTask().execute();
+            model.getGitUserDetails(user).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<GitUserViewModel>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(GitUserViewModel gitUserViewModel) {
+                            Log.i(TAG, "El usuario " + gitUserViewModel.getUsername() + " encontrado!!");
+                            if (view != null) {
+                                view.showSnackBar("Usuario " + gitUserViewModel.getUsername() + " encontrado!");
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.i(TAG, "El usuario no se ha encontrado!!");
+                            if (view != null) {
+                                view.setUserNotExist("Este usuario no existe");
+                                view.hideProgress();
+                            }
+
+                            Log.e(TAG, e.getMessage(), e);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            if (view != null) {
+                                view.hideProgress();
+                            }
+                        }
+                    });
         }
 
-    }
-
-    class DummyAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                Thread.sleep(1000);
-                //model.getGitUserDetails(user);
-            } catch (Exception e) {
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if (view != null) {
-                view.hideProgress();
-            }
-        }
     }
 
     @Override

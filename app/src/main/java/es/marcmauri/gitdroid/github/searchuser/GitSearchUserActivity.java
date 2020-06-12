@@ -1,7 +1,5 @@
 package es.marcmauri.gitdroid.github.searchuser;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -64,12 +64,16 @@ public class GitSearchUserActivity extends AppCompatActivity implements GitSearc
 
     @Override
     public void showProgress() {
+        etUsername.setEnabled(false);
+        btnGetRepos.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
         progressBar.setVisibility(View.GONE);
+        etUsername.setEnabled(true);
+        btnGetRepos.setEnabled(true);
     }
 
     @Override

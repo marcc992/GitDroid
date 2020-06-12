@@ -20,7 +20,7 @@ public class GitHubApiModule {
     // todo: recuperar token / api key / whatever needed
 
     @Provides
-    public OkHttpClient provideClient() {
+    public OkHttpClient provideHttpClient() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor()
                 .setLevel(HttpLoggingInterceptor.Level.BASIC);
 
@@ -30,6 +30,7 @@ public class GitHubApiModule {
                 Request request = chain.request();
                 request = request.newBuilder()
                         .addHeader("Accept", "application/vnd.github.v3+json")
+                        .addHeader("Authorization", "Bearer GITHUB_TOKEN_HERE")
                         .build();
                 return chain.proceed(request);
             }
@@ -53,6 +54,6 @@ public class GitHubApiModule {
 
     @Provides
     public GitHubApiService provideApiService() {
-        return provideRetrofit(BASE_URL, provideClient()).create(GitHubApiService.class);
+        return provideRetrofit(BASE_URL, provideHttpClient()).create(GitHubApiService.class);
     }
 }

@@ -5,7 +5,5 @@ import io.reactivex.Observable;
 
 public interface GitSearchUserRepository {
 
-    Observable<UserApi> getGitUserDetailsFromNetwork(String username);
-    Observable<UserApi> getGitUserDetailsFromCache(String username);
     Observable<UserApi> getGitUserDetails(String username);
 }

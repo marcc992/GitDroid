@@ -1,9 +1,11 @@
 package es.marcmauri.gitdroid.github.searchuser;
 
 import es.marcmauri.gitdroid.github.GitUserViewModel;
+import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
-public class GitSearchUserModel implements GitSearchUserMVP.Model{
+public class GitSearchUserModel implements GitSearchUserMVP.Model {
 
     private static final String TAG = GitSearchUserModel.class.getName();
 
@@ -15,9 +17,17 @@ public class GitSearchUserModel implements GitSearchUserMVP.Model{
 
     @Override
     public Observable<GitUserViewModel> getGitUserDetails(String username) {
-        // Todo: El repo nos podria mandar un pojo, y aqui en el Modelo encargarnos de
-        //       transformarlo al objeto ViewModel
-        //return githubRepository.getGitUserDetails(username);
-        return Observable.empty();
+        return githubRepository.getGitUserDetails(username)
+                .flatMap(new Function<UserApi, Observable<GitUserViewModel>>() {
+                    @Override
+                    public Observable<GitUserViewModel> apply(UserApi userApi) {
+                        GitUserViewModel gitUser = new GitUserViewModel(
+                                userApi.getId(),
+                                userApi.getLogin(),
+                                userApi.getAvatarUrl());
+
+                        return Observable.just(gitUser);
+                    }
+                });
     }
 }
