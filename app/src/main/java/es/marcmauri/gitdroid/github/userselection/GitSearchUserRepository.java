@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.searchuser;
+package es.marcmauri.gitdroid.github.userselection;
 
 import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;

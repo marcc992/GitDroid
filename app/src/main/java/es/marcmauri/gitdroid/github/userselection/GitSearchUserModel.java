@@ -1,6 +1,6 @@
-package es.marcmauri.gitdroid.github.searchuser;
+package es.marcmauri.gitdroid.github.userselection;
 
-import es.marcmauri.gitdroid.github.GitUserViewModel;
+import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
@@ -16,17 +16,17 @@ public class GitSearchUserModel implements GitSearchUserMVP.Model {
     }
 
     @Override
-    public Observable<GitUserViewModel> getGitUserDetails(String username) {
+    public Observable<GitUserModel> getGitUserDetails(String username) {
         return githubRepository.getGitUserDetails(username)
-                .flatMap(new Function<UserApi, Observable<GitUserViewModel>>() {
+                .flatMap(new Function<UserApi, Observable<GitUserModel>>() {
                     @Override
-                    public Observable<GitUserViewModel> apply(UserApi userApi) {
-                        GitUserViewModel gitUser = new GitUserViewModel(
+                    public Observable<GitUserModel> apply(UserApi userApi) {
+                        GitUserModel gitUserModel = new GitUserModel(
                                 userApi.getId(),
                                 userApi.getLogin(),
                                 userApi.getAvatarUrl());
 
-                        return Observable.just(gitUser);
+                        return Observable.just(gitUserModel);
                     }
                 });
     }

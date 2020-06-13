@@ -1,10 +1,14 @@
-package es.marcmauri.gitdroid.github.searchuser;
+package es.marcmauri.gitdroid.github.userselection;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import es.marcmauri.gitdroid.github.GitUserViewModel;
+import es.marcmauri.gitdroid.common.ExtraTags;
+import es.marcmauri.gitdroid.github.repositorylist.GitRepositoriesActivity;
+import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -26,7 +30,7 @@ public class GitSearchUserPresenter implements GitSearchUserMVP.Presenter {
 
 
     @Override
-    public void checkIfUserExists(String user) {
+    public void checkUserAndGoToRepos(String user) {
         Log.i(TAG, "Github user to found: " + user);
 
         if (user == null || user.isEmpty()) {
@@ -39,17 +43,19 @@ public class GitSearchUserPresenter implements GitSearchUserMVP.Presenter {
             }
 
             model.getGitUserDetails(user).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<GitUserViewModel>() {
+                    .subscribe(new Observer<GitUserModel>() {
                         @Override
                         public void onSubscribe(Disposable d) {
 
                         }
 
                         @Override
-                        public void onNext(GitUserViewModel gitUserViewModel) {
-                            Log.i(TAG, "El usuario " + gitUserViewModel.getUsername() + " encontrado!!");
+                        public void onNext(GitUserModel gitUserModel) {
+                            Log.i(TAG, "El usuario " + gitUserModel.getUsername() + " encontrado!!");
                             if (view != null) {
-                                view.showSnackBar("Usuario " + gitUserViewModel.getUsername() + " encontrado!");
+                                Intent intentToRepos = new Intent((Context) view, GitRepositoriesActivity.class);
+                                intentToRepos.putExtra(ExtraTags.EXTRA_GIT_USER, gitUserModel);
+                                view.navigateToNextActivity(intentToRepos);
                             }
                         }
 

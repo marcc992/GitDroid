@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.searchuser;
+package es.marcmauri.gitdroid.github.userselection;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -107,7 +107,7 @@ public class GitSearchUserActivity extends AppCompatActivity implements GitSearc
         btnGetRepos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.checkIfUserExists(etUsername.getText().toString());
+                presenter.checkUserAndGoToRepos(etUsername.getText().toString());
             }
         });
     }
