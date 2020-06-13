@@ -50,7 +50,7 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate()");
 
-        setContentView(R.layout.activity_git_list_repos);
+        setContentView(R.layout.activity_git_repositories);
 
         ((App) getApplication()).getComponent().inject(this);
 
@@ -67,7 +67,7 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         Log.i(TAG, "onResume()");
 
         presenter.setView(this);
-        presenter.loadUserDetails();
+        presenter.recoverUserDetails();
         presenter.loadRepositories();
     }
 

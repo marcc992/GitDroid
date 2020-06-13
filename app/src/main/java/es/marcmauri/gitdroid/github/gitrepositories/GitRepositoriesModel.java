@@ -13,18 +13,18 @@ public class GitRepositoriesModel implements GitRepositoriesMVP.Model, Function<
 
     private static final String TAG = GitRepositoriesModel.class.getName();
 
-    private GitRepositoriesRepository githubRepository;
+    private GitRepositoriesRepository repository;
 
-    public GitRepositoriesModel(GitRepositoriesRepository githubRepository) {
-        this.githubRepository = githubRepository;
+    public GitRepositoriesModel(GitRepositoriesRepository repository) {
+        this.repository = repository;
     }
 
     private Observable<GitRepositoryBasicModel> getGitRepositoriesFromUser(String username) {
-        return githubRepository.getGitRepositoriesFromUser(username).flatMap(this);
+        return repository.getGitRepositoriesFromUser(username).flatMap(this);
     }
 
     private Observable<GitRepositoryBasicModel> getGitRepositoriesFromOrganization(String org) {
-        return githubRepository.getGitRepositoriesFromOrganization(org).flatMap(this);
+        return repository.getGitRepositoriesFromOrganization(org).flatMap(this);
     }
 
     @Override

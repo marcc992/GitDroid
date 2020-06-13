@@ -33,7 +33,7 @@ public class GitUserSelectionActivity extends AppCompatActivity implements GitUs
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_git_search_user);
+        setContentView(R.layout.activity_git_user_selection);
 
         Log.i(TAG, "onCreate()");
 

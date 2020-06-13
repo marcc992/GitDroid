@@ -24,7 +24,7 @@ public interface GitRepositoriesMVP {
     }
 
     interface Presenter {
-        void loadUserDetails();
+        void recoverUserDetails();
         void loadRepositories();
         void loadRepositoryDetails(GitRepositoryBasicModel repository);
 

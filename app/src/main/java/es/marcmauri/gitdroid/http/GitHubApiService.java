@@ -31,4 +31,10 @@ public interface GitHubApiService {
             @Query("page") Integer page,
             @Query("per_page") Integer reposPerPage
     );
+
+    @GET("repos/{user}/{repositoryName}")
+    Observable<RepositoryApi> getRepositoryDetail(
+            @Path("user") String user,
+            @Path("repositoryName") String repositoryName
+    );
 }

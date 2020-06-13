@@ -8,17 +8,17 @@ import es.marcmauri.gitdroid.http.GitHubApiService;
 public class GitRepositoriesModule {
 
     @Provides
-    public GitRepositoriesMVP.Presenter provideGitListReposPresenter(GitRepositoriesMVP.Model model) {
+    public GitRepositoriesMVP.Presenter provideGitRepositoriesPresenter(GitRepositoriesMVP.Model model) {
         return new GitRepositoriesPresenter(model);
     }
 
     @Provides
-    public GitRepositoriesMVP.Model provideGitListReposModel(GitRepositoriesRepository gitRepositoriesRepository) {
+    public GitRepositoriesMVP.Model provideGitRepositoriesModel(GitRepositoriesRepository gitRepositoriesRepository) {
         return new GitRepositoriesModel(gitRepositoriesRepository);
     }
 
     @Provides
-    public GitRepositoriesRepository provideGitListReposRepository(GitHubApiService gitHubApiService) {
+    public GitRepositoriesRepository provideGitRepositoriesRepository(GitHubApiService gitHubApiService) {
         return new GitRepositoriesRepositoryFromGithub(gitHubApiService);
     }
 }

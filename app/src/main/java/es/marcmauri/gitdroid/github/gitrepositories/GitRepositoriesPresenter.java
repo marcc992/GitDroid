@@ -32,15 +32,15 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
     }
 
     @Override
-    public void loadUserDetails() {
-        Log.i(TAG, "loadUserDetails() has called");
+    public void recoverUserDetails() {
+        Log.i(TAG, "recoverUserDetails() has called");
         if (view != null) {
             if (gitUserModel == null) {
-                Log.i(TAG, "The current git user is null. We try to get it from view extras");
+                Log.i(TAG, "Git user details is null. We try to get it from view extras");
                 gitUserModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_USER);
             }
             if (gitUserModel != null) {
-                Log.i(TAG, "Git details have gotten successfully");
+                Log.i(TAG, "Git user details have gotten successfully");
                 view.setAvatar(gitUserModel.getAvatarUrl());
                 view.setUsername(gitUserModel.getUsername());
             } else {
@@ -52,12 +52,14 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
     @Override
     public void loadRepositories() {
+        Log.i(TAG, "loadRepositories() has called");
+
         if (view != null) {
             view.showProgress();
         }
 
         if (gitUserModel == null) {
-            loadUserDetails();
+            recoverUserDetails();
         }
 
         if (gitUserModel != null) {
@@ -95,7 +97,10 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
         } else {
             Log.e(TAG, "Git user details have not been recovered");
-            view.showSnackBar("TODO: No se han podido recuperar los repositorios porque el usuario no se encuentra disponible");
+            if (view != null) {
+                view.hideProgress();
+                view.showSnackBar("TODO: No se han podido recuperar los repositorios porque el usuario no se encuentra disponible");
+            }
         }
     }
 
@@ -104,7 +109,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
         Log.i(TAG, "loadRepositoryDetails() repository.name = " + repository.getName());
 
         if (gitUserModel == null) {
-            loadUserDetails();
+            recoverUserDetails();
         }
 
         if (view != null) {

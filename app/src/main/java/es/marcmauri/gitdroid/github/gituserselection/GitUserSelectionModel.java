@@ -9,15 +9,15 @@ public class GitUserSelectionModel implements GitUserSelectionMVP.Model {
 
     private static final String TAG = GitUserSelectionModel.class.getName();
 
-    private GitUserSelectionRepository githubRepository;
+    private GitUserSelectionRepository repository;
 
-    public GitUserSelectionModel(GitUserSelectionRepository githubRepository) {
-        this.githubRepository = githubRepository;
+    public GitUserSelectionModel(GitUserSelectionRepository repository) {
+        this.repository = repository;
     }
 
     @Override
     public Observable<GitUserModel> getGitUserDetails(String username) {
-        return githubRepository.getGitUserDetails(username)
+        return repository.getGitUserDetails(username)
                 .flatMap(new Function<UserApi, Observable<GitUserModel>>() {
                     @Override
                     public Observable<GitUserModel> apply(UserApi userApi) {
