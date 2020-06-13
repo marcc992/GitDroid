@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.repositorylist;
+package es.marcmauri.gitdroid.github.gitrepositories;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +26,7 @@ public interface GitRepositoriesMVP {
     interface Presenter {
         void loadUserDetails();
         void loadRepositories();
+        void loadRepositoryDetails(GitRepositoryBasicModel repository);
 
         void rxJavaUnsubscribe();
 

@@ -2,8 +2,8 @@ package es.marcmauri.gitdroid.root;
 
 import android.app.Application;
 
-import es.marcmauri.gitdroid.github.userselection.GitSearchUserModule;
-import es.marcmauri.gitdroid.github.repositorylist.GitRepositoriesModule;
+import es.marcmauri.gitdroid.github.gituserselection.GitUserSelectionModule;
+import es.marcmauri.gitdroid.github.gitrepositories.GitRepositoriesModule;
 import es.marcmauri.gitdroid.http.GitHubApiModule;
 
 public class App extends Application {
@@ -16,7 +16,7 @@ public class App extends Application {
 
         component = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
-                .gitSearchUserModule(new GitSearchUserModule())
+                .gitUserSelectionModule(new GitUserSelectionModule())
                 .gitRepositoriesModule(new GitRepositoriesModule())
                 .gitHubApiModule(new GitHubApiModule())
                 .build();

@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.repositorylist;
+package es.marcmauri.gitdroid.github.gitrepositories;
 
 import dagger.Module;
 import dagger.Provides;

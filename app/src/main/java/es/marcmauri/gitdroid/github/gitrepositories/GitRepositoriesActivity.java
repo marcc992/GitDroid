@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.repositorylist;
+package es.marcmauri.gitdroid.github.gitrepositories;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -155,13 +155,17 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
 
     private void setRecyclerView() {
         Log.i(TAG, "setRecyclerView()");
-        repositoryListAdapter = new GitRepositoryListAdapter(repositoryList);
+        repositoryListAdapter = new GitRepositoryListAdapter(repositoryList, new GitRepositoryListAdapter.OnItemClickListener() {
+            @Override
+            public void onRepositoryClick(GitRepositoryBasicModel repository) {
+                presenter.loadRepositoryDetails(repository);
+            }
+        });
 
         recyclerView.setAdapter(repositoryListAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
     }
 }

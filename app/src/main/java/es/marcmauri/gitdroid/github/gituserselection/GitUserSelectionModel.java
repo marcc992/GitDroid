@@ -1,17 +1,17 @@
-package es.marcmauri.gitdroid.github.userselection;
+package es.marcmauri.gitdroid.github.gituserselection;
 
 import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
-public class GitSearchUserModel implements GitSearchUserMVP.Model {
+public class GitUserSelectionModel implements GitUserSelectionMVP.Model {
 
-    private static final String TAG = GitSearchUserModel.class.getName();
+    private static final String TAG = GitUserSelectionModel.class.getName();
 
-    private GitSearchUserRepository githubRepository;
+    private GitUserSelectionRepository githubRepository;
 
-    public GitSearchUserModel(GitSearchUserRepository githubRepository) {
+    public GitUserSelectionModel(GitUserSelectionRepository githubRepository) {
         this.githubRepository = githubRepository;
     }
 

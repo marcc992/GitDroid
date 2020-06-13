@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.repositorylist;
+package es.marcmauri.gitdroid.github.gitrepositories;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -18,12 +19,14 @@ import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 
 public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepositoryListAdapter.RepositoryListItemViewHolder> {
 
-    private final String TAG = GitRepositoryListAdapter.class.getName();
+    private static final String TAG = GitRepositoryListAdapter.class.getName();
     private List<GitRepositoryBasicModel> repositoryList;
+    private OnItemClickListener listener;
 
 
-    public GitRepositoryListAdapter(List<GitRepositoryBasicModel> repositoryList) {
+    public GitRepositoryListAdapter(List<GitRepositoryBasicModel> repositoryList, OnItemClickListener listener) {
         this.repositoryList = repositoryList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,7 +42,7 @@ public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepository
     @Override
     public void onBindViewHolder(@NonNull RepositoryListItemViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder() called");
-        holder.bind(repositoryList.get(position));
+        holder.bind(this.repositoryList.get(position), this.listener);
     }
 
     @Override
@@ -51,6 +54,7 @@ public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepository
 
     public static class RepositoryListItemViewHolder extends RecyclerView.ViewHolder {
 
+        private CardView cardviewItem;
         private TextView tvRepoName;
         private TextView tvRepoCreatedAt;
         private TextView tvRepoUpdatedAt;
@@ -59,21 +63,37 @@ public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepository
         public RepositoryListItemViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            this.cardviewItem = itemView.findViewById(R.id.cardview_repository_item);
             this.tvRepoName = itemView.findViewById(R.id.tv_repository_name);
             this.tvRepoCreatedAt = itemView.findViewById(R.id.tv_repository_created_at);
             this.tvRepoUpdatedAt = itemView.findViewById(R.id.tv_repository_updated_at);
             this.tvRepoDescription = itemView.findViewById(R.id.tv_repository_description);
         }
 
-        public void bind(final GitRepositoryBasicModel repository) {
-            this.tvRepoName.setText(repository.getName());
-            this.tvRepoDescription.setText(repository.getDescription());
+        public void bind(final GitRepositoryBasicModel currentRepository, final OnItemClickListener listener) {
+            // Set texts on recycler item
+            this.tvRepoName.setText(currentRepository.getName());
+            this.tvRepoDescription.setText(currentRepository.getDescription());
 
+            // Set dates on recycler item
             SimpleDateFormat dateFormat = new SimpleDateFormat("d MMM yyyy", Locale.getDefault());
-            String createdAt = dateFormat.format(repository.getCreatedAt());
-            String updatedAt = dateFormat.format(repository.getUpdatedAt());
+            String createdAt = dateFormat.format(currentRepository.getCreatedAt());
+            String updatedAt = dateFormat.format(currentRepository.getUpdatedAt());
             this.tvRepoCreatedAt.setText(String.format("Created at:  %s", createdAt));
             this.tvRepoUpdatedAt.setText(String.format("Updated at:  %s", updatedAt));
+
+            // Set on recycler item click listener
+            this.cardviewItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i(TAG, "RecyclerView on click listener for repository " + currentRepository.getName());
+                    listener.onRepositoryClick(currentRepository);
+                }
+            });
         }
+    }
+
+    public interface OnItemClickListener {
+        void onRepositoryClick(GitRepositoryBasicModel repository);
     }
 }

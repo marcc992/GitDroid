@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ccc"
-    tools:context=".github.userselection.GitSearchUserActivity">
+    tools:context=".github.gituserselection.GitUserSelectionActivity">
 
     <TextView
         android:id="@+id/tv_app_title"

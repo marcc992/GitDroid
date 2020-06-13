@@ -1,11 +1,11 @@
-package es.marcmauri.gitdroid.github.userselection;
+package es.marcmauri.gitdroid.github.gituserselection;
 
 import android.content.Intent;
 
 import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import io.reactivex.Observable;
 
-public interface GitSearchUserMVP {
+public interface GitUserSelectionMVP {
 
     interface View {
         void showProgress();
@@ -26,7 +26,7 @@ public interface GitSearchUserMVP {
 
         void rxJavaUnsubscribe();
 
-        void setView(GitSearchUserMVP.View view);
+        void setView(GitUserSelectionMVP.View view);
     }
 
     interface Model {

@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.userselection;
+package es.marcmauri.gitdroid.github.gituserselection;
 
 import android.util.Log;
 
@@ -6,12 +6,12 @@ import es.marcmauri.gitdroid.http.GitHubApiService;
 import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;
 
-public class GitSearchUserRepositoryFromGithub implements GitSearchUserRepository {
+public class GitUserSelectionRepositoryFromGithub implements GitUserSelectionRepository {
 
-    private static final String TAG = GitSearchUserRepositoryFromGithub.class.getName();
+    private static final String TAG = GitUserSelectionRepositoryFromGithub.class.getName();
     private GitHubApiService gitHubApiService;
 
-    public GitSearchUserRepositoryFromGithub(GitHubApiService gitHubApiService) {
+    public GitUserSelectionRepositoryFromGithub(GitHubApiService gitHubApiService) {
         this.gitHubApiService = gitHubApiService;
     }
 

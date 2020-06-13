@@ -12,8 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".github.repositorylist.GitRepositoriesActivity"></activity>
-        <activity android:name=".github.userselection.GitSearchUserActivity">
+        <activity android:name=".github.gitrepositorydetail.GitRepositoryDetailActivity"></activity>
+        <activity android:name=".github.gitrepositories.GitRepositoriesActivity" />
+        <activity android:name=".github.gituserselection.GitUserSelectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

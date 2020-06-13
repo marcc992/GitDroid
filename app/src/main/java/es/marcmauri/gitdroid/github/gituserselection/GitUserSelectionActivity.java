@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.userselection;
+package es.marcmauri.gitdroid.github.gituserselection;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,9 +18,9 @@ import javax.inject.Inject;
 import es.marcmauri.gitdroid.R;
 import es.marcmauri.gitdroid.root.App;
 
-public class GitSearchUserActivity extends AppCompatActivity implements GitSearchUserMVP.View {
+public class GitUserSelectionActivity extends AppCompatActivity implements GitUserSelectionMVP.View {
 
-    private final String TAG = GitSearchUserActivity.class.getName();
+    private final String TAG = GitUserSelectionActivity.class.getName();
 
     private ViewGroup rootView;
     private EditText etUsername;
@@ -28,7 +28,7 @@ public class GitSearchUserActivity extends AppCompatActivity implements GitSearc
     private ProgressBar progressBar;
 
     @Inject
-    GitSearchUserMVP.Presenter presenter;
+    GitUserSelectionMVP.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

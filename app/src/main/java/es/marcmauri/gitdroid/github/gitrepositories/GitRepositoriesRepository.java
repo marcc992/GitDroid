@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.repositorylist;
+package es.marcmauri.gitdroid.github.gitrepositories;
 
 import es.marcmauri.gitdroid.http.apimodel.github.RepositoryApi;
 import io.reactivex.Observable;

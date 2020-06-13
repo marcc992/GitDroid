@@ -1,4 +1,4 @@
-package es.marcmauri.gitdroid.github.userselection;
+package es.marcmauri.gitdroid.github.gituserselection;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,24 +7,24 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import es.marcmauri.gitdroid.common.ExtraTags;
-import es.marcmauri.gitdroid.github.repositorylist.GitRepositoriesActivity;
+import es.marcmauri.gitdroid.github.gitrepositories.GitRepositoriesActivity;
 import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class GitSearchUserPresenter implements GitSearchUserMVP.Presenter {
+public class GitUserSelectionPresenter implements GitUserSelectionMVP.Presenter {
 
-    private static final String TAG = GitSearchUserPresenter.class.getName();
+    private static final String TAG = GitUserSelectionPresenter.class.getName();
 
     @Nullable
-    private GitSearchUserMVP.View view;
-    private GitSearchUserMVP.Model model;
+    private GitUserSelectionMVP.View view;
+    private GitUserSelectionMVP.Model model;
 
     private Disposable getDataSubscription = null;
 
-    public GitSearchUserPresenter(GitSearchUserMVP.Model model) {
+    public GitUserSelectionPresenter(GitUserSelectionMVP.Model model) {
         this.model = model;
     }
 
@@ -90,7 +90,7 @@ public class GitSearchUserPresenter implements GitSearchUserMVP.Presenter {
     }
 
     @Override
-    public void setView(GitSearchUserMVP.View view) {
+    public void setView(GitUserSelectionMVP.View view) {
         Log.i(TAG, "setView(view) called");
         this.view = view;
     }
