@@ -1,15 +1,18 @@
 package es.marcmauri.gitdroid.github.gitrepositorydetail;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
@@ -24,10 +27,11 @@ public class GitRepositoryDetailActivity extends AppCompatActivity implements Gi
     GitRepositoryDetailMVP.Presenter presenter;
 
     private ConstraintLayout rootView;
-    private TextView tvName;
-    private TextView tvFullName;
-    private TextView tvDescription;
-    private WebView webView;
+    private TextView tvUserName;
+    private ImageView ivUserAvatar;
+    private TextView tvRepositoryName;
+    private WebView webViewGitRepositoryInfo;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,7 @@ public class GitRepositoryDetailActivity extends AppCompatActivity implements Gi
         Log.i(TAG, "onResume()");
 
         presenter.setView(this);
+        presenter.recoverUserDetails();
         presenter.loadRepositoryDetails();
     }
 
@@ -57,44 +62,48 @@ public class GitRepositoryDetailActivity extends AppCompatActivity implements Gi
         Log.i(TAG, "onStop()");
 
         presenter.rxJavaUnsubscribe();
+        webViewGitRepositoryInfo.clearCache(true);
     }
 
     @Override
-    public void setName(String text) {
-        Log.i(TAG, "setName() text = " + text);
-        //todo tvName.setText(text);
+    public void setUserName(String userName) {
+        Log.i(TAG, "setUserName(username = " + userName + ")");
+        tvUserName.setText(userName);
     }
 
     @Override
-    public void setFullName(String text) {
-        Log.i(TAG, "setFullName() text = " + text);
-        //todo tvFullName.setText(text);
-        showSnackBar(text);
+    public void setUserAvatar(String imageUrl) {
+        Log.i(TAG, "setUserAvatar(imageUrl = " + imageUrl + ")");
+        Picasso.get().load(imageUrl).fit().centerCrop().into(ivUserAvatar);
     }
 
     @Override
-    public void setDescription(String text) {
-        Log.i(TAG, "setDescription() text = " + text);
-        //todo tvDescription.setText(text);
+    public void setRepositoryName(String text) {
+        Log.i(TAG, "setRepositoryName(text = " + text + ")");
+        tvRepositoryName.setText(text);
     }
 
     @Override
     public void setWebViewContent(String url) {
-        //TODO
+        Log.i(TAG, "setWebViewContent(url = " + url + ")");
+        webViewGitRepositoryInfo.loadUrl(url);
     }
 
     @Override
     public void showProgress() {
-        //TODO
+        Log.i(TAG, "showProgress()");
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        //TODO
+        Log.i(TAG, "hideProgress()");
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void showSnackBar(String message) {
+        Log.i(TAG, "showSnackBar() msg: " + message);
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -110,13 +119,12 @@ public class GitRepositoryDetailActivity extends AppCompatActivity implements Gi
         }
     }
 
-    @Override
-    public void shareGitLink(Intent i) {
-        //TODO
-    }
-
     private void bindUI() {
-        //TODO
         rootView = findViewById(R.id.activity_git_repository_detail_root_view);
+        tvUserName = findViewById(R.id.tv_username);
+        ivUserAvatar = findViewById(R.id.iv_user_avatar);
+        tvRepositoryName = findViewById(R.id.tv_repository_name);
+        webViewGitRepositoryInfo = findViewById(R.id.webview_git_repository_info);
+        progressBar = findViewById(R.id.progressBar_git_repository_detail);
     }
 }

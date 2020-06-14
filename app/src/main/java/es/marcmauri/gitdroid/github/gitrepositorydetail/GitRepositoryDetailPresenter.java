@@ -11,7 +11,6 @@ import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Presenter {
@@ -32,21 +31,6 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
         this.model = model;
     }
 
-    private void recoverUserDetails() {
-        Log.i(TAG, "recoverUserDetails() has called");
-        if (view != null) {
-            if (gitUserModel == null) {
-                Log.i(TAG, "Git user details is null. We try to get it from view extras");
-                gitUserModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_USER);
-            }
-            if (gitUserModel != null) {
-                Log.i(TAG, "Git user details have gotten successfully");
-            } else {
-                Log.e(TAG, "Git user details have not been recovered");
-                view.showSnackBar("TODO: No se han podido recuperar los datos de usuario");
-            }
-        }
-    }
 
     private void recoverBasicRepositoryDetails() {
         Log.i(TAG, "recoverBasicRepositoryDetails() has called");
@@ -60,6 +44,25 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
             } else {
                 Log.e(TAG, "Git repository basic details have not been recovered");
                 view.showSnackBar("TODO: No se han podido recuperar los datos del repositorio seleccionado");
+            }
+        }
+    }
+
+    @Override
+    public void recoverUserDetails() {
+        Log.i(TAG, "recoverUserDetails() has called");
+        if (view != null) {
+            if (gitUserModel == null) {
+                Log.i(TAG, "Git user details is null. We try to get it from view extras");
+                gitUserModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_USER);
+            }
+            if (gitUserModel != null) {
+                Log.i(TAG, "Git user details have gotten successfully");
+                view.setUserName(gitUserModel.getUsername());
+                view.setUserAvatar(gitUserModel.getAvatarUrl());
+            } else {
+                Log.e(TAG, "Git user details have not been recovered");
+                view.showSnackBar("TODO: No se han podido recuperar los datos de usuario");
             }
         }
     }
@@ -88,10 +91,8 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
                         @Override
                         public void accept(GitRepositoryDetailedModel gitRepositoryDetailedModel) {
                             if (view != null) {
-                                view.setName(gitRepositoryDetailedModel.getName());
-                                view.setFullName(gitRepositoryDetailedModel.getFullName());
-                                view.setDescription(gitRepositoryDetailedModel.getDescription());
-                                view.setWebViewContent(gitRepositoryDetailedModel.getHomepage());
+                                view.setRepositoryName(gitRepositoryDetailedModel.getFullName());
+                                view.setWebViewContent(gitRepositoryDetailedModel.getHtmlUrl());
 
                                 view.hideProgress();
                             }

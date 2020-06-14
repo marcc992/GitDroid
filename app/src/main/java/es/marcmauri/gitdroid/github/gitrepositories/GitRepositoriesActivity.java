@@ -1,12 +1,5 @@
 package es.marcmauri.gitdroid.github.gitrepositories;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +7,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
@@ -149,7 +149,7 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         tvUsername = findViewById(R.id.tv_username);
         ivUserAvatar = findViewById(R.id.iv_user_avatar);
         recyclerView = findViewById(R.id.recyclerView_git_repositories);
-        progressBar = findViewById(R.id.progressBar_search_repositories);
+        progressBar = findViewById(R.id.progressBar_git_repositories);
 
     }
 

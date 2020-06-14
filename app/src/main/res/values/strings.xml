@@ -3,4 +3,6 @@
     <string name="text_general_github_my_user_account">marcc992</string>
     <string name="text_general_app_description">Searching repositories from GitHub has never been so easy.\n\nYou just need to put an actual username below an press on Get Repos!</string>
     <string name="button_get_repos">Get Repos!</string>
+    <string name="content_description_image_user_avatar">Selected Git user avatar</string>
+    <string name="text_repository_selected">Repository:</string>
 </resources>
