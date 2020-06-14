@@ -10,6 +10,8 @@ import es.marcmauri.gitdroid.common.ExtraTags;
 import es.marcmauri.gitdroid.github.gitrepositorydetail.GitRepositoryDetailActivity;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -20,6 +22,9 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
     private static final String TAG = GitRepositoriesPresenter.class.getName();
 
     private GitUserModel gitUserModel = null;
+    private int lastReposPage = 0;
+    private boolean loadingPage = false;
+    private boolean allPagesRetrieved = false;
 
     @Nullable
     private GitRepositoriesMVP.View view;
@@ -50,6 +55,74 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
         }
     }
 
+    private void getNextGitRepositoriesPage() {
+        Log.i(TAG, "getNextGitRepositoriesPage() called");
+
+        if (!allPagesRetrieved) {
+            if (!loadingPage) {
+                Log.i(TAG, "There is not a loading page process. Let's to load the next page!");
+                loadingPage = true;
+
+                if (view != null) {
+                    view.showProgress();
+                }
+
+                getDataSubscription = model.getGitRepositories(gitUserModel.getUsername(), ++lastReposPage)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .switchIfEmpty(new Observable<GitRepositoryBasicModel>() {
+                            @Override
+                            protected void subscribeActual(Observer<? super GitRepositoryBasicModel> observer) {
+                                Log.e(TAG, "No more pages to retrieve! The previous call was the last one.");
+                                if (view != null) {
+                                    view.hideProgress();
+                                    view.showSnackBar("All pages were retrieved");
+                                }
+                                allPagesRetrieved = true;
+                                loadingPage = false;
+                            }
+                        })
+                        .subscribeWith(new DisposableObserver<GitRepositoryBasicModel>() {
+                            @Override
+                            public void onNext(GitRepositoryBasicModel repository) {
+                                Log.i(TAG, "Git repository fetched: " + repository.getName());
+                                if (view != null) {
+                                    view.addRepository(repository);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.e(TAG, e.getMessage(), e);
+                                if (view != null) {
+                                    view.removeAllRepositories();
+                                    view.hideProgress();
+                                    view.showSnackBar("No public repositories found from " + gitUserModel.getUsername());
+                                    allPagesRetrieved = true;
+                                    loadingPage = false;
+                                }
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Log.i(TAG, "All repositories fetched from current call");
+                                if (view != null) {
+                                    view.hideProgress();
+                                    view.showSnackBar("Repositories from page " + lastReposPage + " fetched successfully!");
+                                    loadingPage = false;
+                                }
+                            }
+                        });
+
+            } else {
+                Log.i(TAG, "There is a loading page process. Aborting his new load...");
+            }
+
+        } else {
+            Log.i(TAG, "There are not more pages to retrieve from GitHub server");
+        }
+    }
+
     @Override
     public void loadRepositories() {
         Log.i(TAG, "loadRepositories() has called");
@@ -63,37 +136,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
         }
 
         if (gitUserModel != null) {
-            getDataSubscription = model.getGitRepositories(gitUserModel.getUsername())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableObserver<GitRepositoryBasicModel>() {
-                        @Override
-                        public void onNext(GitRepositoryBasicModel repository) {
-                            Log.i(TAG, "Git repository fetched: " + repository.getName());
-                            if (view != null) {
-                                view.addRepository(repository);
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e(TAG, e.getMessage(), e);
-                            if (view != null) {
-                                view.removeAllRepositories();
-                                view.hideProgress();
-                                view.showSnackBar("No public repositories found from " + gitUserModel.getUsername());
-                            }
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            Log.i(TAG, "All repositories fetched from current call");
-                            if (view != null) {
-                                view.hideProgress();
-                                view.showSnackBar("Repositorios recuperados con exito!");
-                            }
-                        }
-                    });
+            getNextGitRepositoriesPage();
 
         } else {
             Log.e(TAG, "Git user details have not been recovered");
@@ -126,11 +169,28 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
     }
 
     @Override
+    public void onRecyclerViewScrolled(int visibleItemCount, int totalItemCount, int pastVisibleItems, int dy) {
+        if (dy > 0) {
+            if ((totalItemCount - visibleItemCount <= pastVisibleItems)) {
+                if (view != null) {
+                    getNextGitRepositoriesPage();
+                }
+            }
+        }
+    }
+
+    @Override
     public void rxJavaUnsubscribe() {
         Log.i(TAG, "rxJavaUnsubscribe() called");
         if (getDataSubscription != null && !getDataSubscription.isDisposed()) {
             getDataSubscription.dispose();
         }
+
+        // TODO: Guardar en bundle para recuperar el estado una vez volvamos del detalle
+        Log.i(TAG, "Then the pages controller must be restored as defaults");
+        lastReposPage = 0;
+        loadingPage = false;
+        allPagesRetrieved = false;
     }
 
     @Override

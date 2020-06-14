@@ -14,6 +14,7 @@ import io.reactivex.functions.Function;
 public class GitRepositoriesRepositoryFromGithub implements GitRepositoriesRepository {
 
     private static final String TAG = GitRepositoriesRepositoryFromGithub.class.getName();
+    private static final int REPOS_PER_PAGE = 10;
     private GitHubApiService gitHubApiService;
 
     public GitRepositoriesRepositoryFromGithub(GitHubApiService gitHubApiService) {
@@ -21,11 +22,11 @@ public class GitRepositoriesRepositoryFromGithub implements GitRepositoriesRepos
     }
 
     @Override
-    public Observable<RepositoryApi> getGitRepositoriesFromUser(final String username) {
-        Log.i(TAG, "Called getGitRepositoriesFromUser(username=" + username + ")");
+    public Observable<RepositoryApi> getGitRepositoriesFromUser(final String username, final int page) {
+        Log.i(TAG, "Called getGitRepositoriesFromUser(username=" + username + ", page=" + page + ")");
 
         Observable<List<RepositoryApi>> allReposObservable =
-                gitHubApiService.getRepositoriesFromUser(username, 1, 10);
+                gitHubApiService.getRepositoriesFromUser(username, page, REPOS_PER_PAGE);
 
         return allReposObservable
                 .concatMap(new Function<List<RepositoryApi>, Observable<RepositoryApi>>() {
@@ -49,11 +50,11 @@ public class GitRepositoriesRepositoryFromGithub implements GitRepositoriesRepos
     }
 
     @Override
-    public Observable<RepositoryApi> getGitRepositoriesFromOrganization(final String organization) {
-        Log.i(TAG, "Called getGitRepositoriesFromOrganization(organization=" + organization + ")");
+    public Observable<RepositoryApi> getGitRepositoriesFromOrganization(final String organization, final int page) {
+        Log.i(TAG, "Called getGitRepositoriesFromOrganization(organization=" + organization  + ", page=" + page + ")");
 
         Observable<List<RepositoryApi>> allReposObservable =
-                gitHubApiService.getRepositoriesFromOrganization(organization, 1, 10);
+                gitHubApiService.getRepositoriesFromOrganization(organization, page, REPOS_PER_PAGE);
 
         return allReposObservable
                 .concatMap(new Function<List<RepositoryApi>, Observable<RepositoryApi>>() {

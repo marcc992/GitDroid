@@ -28,13 +28,14 @@ public interface GitRepositoriesMVP {
         void loadRepositories();
         void loadRepositoryDetails(GitRepositoryBasicModel repository);
 
+        void onRecyclerViewScrolled(int visibleItemCount, int totalItemCount, int pastVisibleItems, int dy);
+
         void rxJavaUnsubscribe();
 
         void setView(GitRepositoriesMVP.View view);
     }
 
     interface Model {
-        // TODO: Pagination
-        Observable<GitRepositoryBasicModel> getGitRepositories(String username);
+        Observable<GitRepositoryBasicModel> getGitRepositories(String username, int page);
     }
 }

@@ -19,12 +19,12 @@ public class GitRepositoriesModel implements GitRepositoriesMVP.Model, Function<
         this.repository = repository;
     }
 
-    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromUser(String username) {
-        return repository.getGitRepositoriesFromUser(username).flatMap(this);
+    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromUser(String username, int page) {
+        return repository.getGitRepositoriesFromUser(username, page).flatMap(this);
     }
 
-    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromOrganization(String org) {
-        return repository.getGitRepositoriesFromOrganization(org).flatMap(this);
+    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromOrganization(String org, int page) {
+        return repository.getGitRepositoriesFromOrganization(org, page).flatMap(this);
     }
 
     @Override
@@ -42,14 +42,16 @@ public class GitRepositoriesModel implements GitRepositoriesMVP.Model, Function<
     }
 
     @Override
-    public Observable<GitRepositoryBasicModel> getGitRepositories(final String user) {
-        return getGitRepositoriesFromUser(user)
+    public Observable<GitRepositoryBasicModel> getGitRepositories(final String user, final int page) {
+        Log.e(TAG, "getGitRepositories(user= " + user + ", page= " + page + ")");
+        return getGitRepositoriesFromUser(user, page)
                 .onErrorResumeNext(new Function<Throwable, Observable<GitRepositoryBasicModel>>() {
                     @Override
                     public Observable<GitRepositoryBasicModel> apply(Throwable throwable) {
                         Log.w(TAG, "Repositories from Username not found, " +
-                                "then we try to get repositories from Organization. User = " + user);
-                        return getGitRepositoriesFromOrganization(user);
+                                "then we try to get repositories from Organization. " +
+                                "User = " + user + ", Page = " + page);
+                        return getGitRepositoriesFromOrganization(user, page);
                     }
                 })
                 .doOnError(new Consumer<Throwable>() {

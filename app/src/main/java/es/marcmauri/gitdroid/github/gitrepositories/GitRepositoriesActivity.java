@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -155,6 +156,7 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
 
     private void setRecyclerView() {
         Log.i(TAG, "setRecyclerView()");
+
         repositoryListAdapter = new GitRepositoryListAdapter(repositoryList, new GitRepositoryListAdapter.OnItemClickListener() {
             @Override
             public void onRepositoryClick(GitRepositoryBasicModel repository) {
@@ -166,6 +168,17 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(false);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                presenter.onRecyclerViewScrolled(
+                        layoutManager.getChildCount(), layoutManager.getItemCount(),
+                        layoutManager.findFirstVisibleItemPosition(), dy);
+            }
+        });
     }
 }

@@ -5,7 +5,7 @@ import io.reactivex.Observable;
 
 public interface GitRepositoriesRepository {
 
-    Observable<RepositoryApi> getGitRepositoriesFromUser(String username);
+    Observable<RepositoryApi> getGitRepositoriesFromUser(final String username, final int page);
 
-    Observable<RepositoryApi> getGitRepositoriesFromOrganization(String organization);
+    Observable<RepositoryApi> getGitRepositoriesFromOrganization(final String organization, final int page);
 }
