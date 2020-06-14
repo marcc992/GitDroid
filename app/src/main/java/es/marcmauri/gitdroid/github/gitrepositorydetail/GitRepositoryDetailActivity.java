@@ -52,7 +52,7 @@ public class GitRepositoryDetailActivity extends AppCompatActivity implements Gi
         Log.i(TAG, "onResume()");
 
         presenter.setView(this);
-        presenter.recoverUserDetails();
+        presenter.loadOwnerDetails();
         presenter.loadRepositoryDetails();
     }
 

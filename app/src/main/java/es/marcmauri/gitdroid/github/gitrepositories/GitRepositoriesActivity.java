@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     GitRepositoriesMVP.Presenter presenter;
 
     private ConstraintLayout rootView;
-    private ConstraintLayout gitUserDetails;
     private TextView tvUsername;
     private ImageView ivUserAvatar;
     private RecyclerView recyclerView;
@@ -68,8 +66,7 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         Log.i(TAG, "onResume()");
 
         presenter.setView(this);
-        presenter.recoverUserDetails();
-        presenter.loadRepositories();
+        presenter.loadPublicRepositories();
     }
 
     @Override
@@ -79,18 +76,6 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
 
         presenter.rxJavaUnsubscribe();
         removeAllRepositories();
-    }
-
-    @Override
-    public void setAvatar(String url) {
-        Log.i(TAG, "setAvatar() url = " + url);
-        Picasso.get().load(url).fit().centerCrop().into(ivUserAvatar);
-    }
-
-    @Override
-    public void setUsername(String username) {
-        Log.i(TAG, "setUsername() username = " + username);
-        tvUsername.setText(username);
     }
 
     @Override
@@ -126,18 +111,6 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     }
 
     @Override
-    public Bundle getExtras() {
-        Log.i(TAG, "getExtras()");
-        if (getIntent() != null) {
-            Log.i(TAG, "getIntent() is not null, we try to return getIntent().getExtras()");
-            return getIntent().getExtras();
-        } else {
-            Log.e(TAG, "getIntent() returns null");
-            return null;
-        }
-    }
-
-    @Override
     public void navigateToNextActivity(Intent i) {
         Log.i(TAG, "navigateToNextActivity()");
         startActivity(i);
@@ -146,7 +119,6 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     private void bindUI() {
         Log.i(TAG, "bindUI()");
         rootView = findViewById(R.id.activity_git_repositories_root_view);
-        gitUserDetails = findViewById(R.id.layout_user_details);
         tvUsername = findViewById(R.id.tv_username);
         ivUserAvatar = findViewById(R.id.iv_user_avatar);
         recyclerView = findViewById(R.id.recyclerView_git_repositories);

@@ -8,6 +8,7 @@ import es.marcmauri.gitdroid.common.ExtraTags;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryDetailedModel;
 import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -17,14 +18,16 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
 
     private static final String TAG = GitRepositoryDetailPresenter.class.getName();
 
-    private GitUserModel gitUserModel = null;
     private GitRepositoryBasicModel gitRepositoryBasicModel = null;
+    boolean loadingUserInfo;
+    boolean loadingRepoInfo;
 
     @Nullable
     GitRepositoryDetailMVP.View view;
     GitRepositoryDetailMVP.Model model;
 
-    private Disposable getDataSubscription = null;
+    private Disposable getOwnerSubscription = null;
+    private Disposable getRepositorySubscription = null;
 
 
     public GitRepositoryDetailPresenter(GitRepositoryDetailMVP.Model model) {
@@ -37,32 +40,69 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
         if (view != null) {
             if (gitRepositoryBasicModel == null) {
                 Log.i(TAG, "Git repository basic details is null. We try to get it from view extras");
-                gitRepositoryBasicModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC);
-            }
-            if (gitUserModel != null) {
-                Log.i(TAG, "Git repository basic details have gotten successfully");
-            } else {
-                Log.e(TAG, "Git repository basic details have not been recovered");
-                view.showSnackBar("TODO: No se han podido recuperar los datos del repositorio seleccionado");
+                if (view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC) != null) {
+                    gitRepositoryBasicModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC);
+                }
             }
         }
     }
 
     @Override
-    public void recoverUserDetails() {
-        Log.i(TAG, "recoverUserDetails() has called");
+    public void loadOwnerDetails() {
+        Log.i(TAG, "loadOwnerDetails() has called");
+
         if (view != null) {
-            if (gitUserModel == null) {
-                Log.i(TAG, "Git user details is null. We try to get it from view extras");
-                gitUserModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_USER);
-            }
-            if (gitUserModel != null) {
-                Log.i(TAG, "Git user details have gotten successfully");
-                view.setUserName(gitUserModel.getUsername());
-                view.setUserAvatar(gitUserModel.getAvatarUrl());
-            } else {
-                Log.e(TAG, "Git user details have not been recovered");
-                view.showSnackBar("TODO: No se han podido recuperar los datos de usuario");
+            view.showProgress();
+            loadingUserInfo = true;
+        }
+
+        if (gitRepositoryBasicModel == null) {
+            recoverBasicRepositoryDetails();
+        }
+
+        if (gitRepositoryBasicModel != null) {
+            getOwnerSubscription = model.getGitUserDetails(gitRepositoryBasicModel.getOwnerName())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) {
+                            Log.e(TAG, "User " + gitRepositoryBasicModel.getOwnerName() + " not found!");
+                            loadingUserInfo = false;
+
+                            if (view != null) {
+                                view.showSnackBar("Git User " + gitRepositoryBasicModel.getOwnerName() + " does not found!");
+
+                                if (!loadingRepoInfo) {
+                                    view.hideProgress();
+                                }
+                            }
+
+                            Log.e(TAG, throwable.getMessage(), throwable);
+                        }
+                    })
+                    .subscribe(new Consumer<GitUserModel>() {
+                        @Override
+                        public void accept(GitUserModel gitUserModel) {
+                            Log.i(TAG, "Repository " + gitUserModel.getUsername() + " found! It will set on view");
+                            loadingUserInfo = false;
+
+                            if (view != null) {
+                                view.setUserName(gitUserModel.getUsername());
+                                view.setUserAvatar(gitUserModel.getAvatarUrl());
+
+                                if (!loadingRepoInfo) {
+                                    view.hideProgress();
+                                }
+                            }
+                        }
+                    });
+
+        } else {
+            Log.e(TAG, "Activity Extras / Bundle could not be fetched successfully...");
+            if (view != null) {
+                view.hideProgress();
+                view.showSnackBar("TODO: No se han podido recuperar los datos del usuario y del repositorio seleccionado");
             }
         }
     }
@@ -73,28 +113,47 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
 
         if (view != null) {
             view.showProgress();
-        }
-
-        if (gitUserModel == null) {
-            recoverUserDetails();
+            loadingRepoInfo = true;
         }
 
         if (gitRepositoryBasicModel == null) {
             recoverBasicRepositoryDetails();
         }
 
-        if (gitUserModel != null && gitRepositoryBasicModel != null) {
-            getDataSubscription = model.getGitRepositoryDetail(gitUserModel.getUsername(), gitRepositoryBasicModel.getName())
+        if (gitRepositoryBasicModel != null) {
+            getRepositorySubscription = model.getGitRepositoryDetail(gitRepositoryBasicModel.getOwnerName(), gitRepositoryBasicModel.getName())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) {
+                            Log.e(TAG, "Repository " + gitRepositoryBasicModel.getName() + " not found!");
+                            loadingRepoInfo = false;
+
+                            if (view != null) {
+                                view.showSnackBar("The detailed " + gitRepositoryBasicModel.getName() + " does not found!");
+
+                                if (!loadingUserInfo) {
+                                    view.hideProgress();
+                                }
+                            }
+
+                            Log.e(TAG, throwable.getMessage(), throwable);
+                        }
+                    })
                     .subscribe(new Consumer<GitRepositoryDetailedModel>() {
                         @Override
                         public void accept(GitRepositoryDetailedModel gitRepositoryDetailedModel) {
+                            Log.i(TAG, "Repository " + gitRepositoryDetailedModel.getName() + " found! It will set on view");
+                            loadingRepoInfo = false;
+
                             if (view != null) {
                                 view.setRepositoryName(gitRepositoryDetailedModel.getFullName());
                                 view.setWebViewContent(gitRepositoryDetailedModel.getHtmlUrl());
 
-                                view.hideProgress();
+                                if (!loadingUserInfo) {
+                                    view.hideProgress();
+                                }
                             }
                         }
                     });
@@ -112,8 +171,11 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
     @Override
     public void rxJavaUnsubscribe() {
         Log.i(TAG, "rxJavaUnsubscribe() called");
-        if (getDataSubscription != null && !getDataSubscription.isDisposed()) {
-            getDataSubscription.dispose();
+        if (getRepositorySubscription != null && !getRepositorySubscription.isDisposed()) {
+            getRepositorySubscription.dispose();
+        }
+        if (getOwnerSubscription != null && !getOwnerSubscription.isDisposed()) {
+            getOwnerSubscription.dispose();
         }
     }
 

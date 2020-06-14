@@ -3,6 +3,7 @@ package es.marcmauri.gitdroid.github.gitrepositorydetail;
 import android.os.Bundle;
 
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryDetailedModel;
+import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import io.reactivex.Observable;
 
 public interface GitRepositoryDetailMVP {
@@ -22,7 +23,7 @@ public interface GitRepositoryDetailMVP {
     }
 
     interface Presenter {
-        void recoverUserDetails();
+        void loadOwnerDetails();
 
         void loadRepositoryDetails();
 
@@ -32,6 +33,7 @@ public interface GitRepositoryDetailMVP {
     }
 
     interface Model {
-        Observable<GitRepositoryDetailedModel> getGitRepositoryDetail(String user, String repositoryName);
+        Observable<GitUserModel> getGitUserDetails(String username);
+        Observable<GitRepositoryDetailedModel> getGitRepositoryDetail(String owner, String repositoryName);
     }
 }

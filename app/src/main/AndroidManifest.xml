@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".github.gitrepositorydetail.GitRepositoryDetailActivity"></activity>
         <activity android:name=".github.gitrepositories.GitRepositoriesActivity" />
-        <activity android:name=".github.gituserselection.GitUserSelectionActivity">
+        <activity android:name=".github.gitmain.GitMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

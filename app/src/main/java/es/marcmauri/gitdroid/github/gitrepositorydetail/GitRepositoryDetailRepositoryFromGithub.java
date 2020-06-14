@@ -4,9 +4,8 @@ import android.util.Log;
 
 import es.marcmauri.gitdroid.http.GitHubApiService;
 import es.marcmauri.gitdroid.http.apimodel.github.RepositoryApi;
+import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
@@ -19,6 +18,28 @@ public class GitRepositoryDetailRepositoryFromGithub implements GitRepositoryDet
         this.gitHubApiService = gitHubApiService;
     }
 
+
+    @Override
+    public Observable<UserApi> getGitUserDetails(final String username) {
+        Log.i(TAG, "Called getGitUserDetails(username=" + username + ")");
+
+        Observable<UserApi> userApiObservable =
+                gitHubApiService.getUserInfoObservable(username);
+
+        return userApiObservable
+                .concatMap(new Function<UserApi, Observable<UserApi>>() {
+                    @Override
+                    public Observable<UserApi> apply(UserApi userApi) {
+                        return Observable.just(userApi);
+                    }
+                })
+                .doOnNext(new Consumer<UserApi>() {
+                    @Override
+                    public void accept(UserApi userApi) {
+                        Log.i(TAG, "User + " + userApi.getName() + " obtained from GitHub");
+                    }
+                });
+    }
 
     @Override
     public Observable<RepositoryApi> getGitRepositoryDetail(final String user, final String repositoryName) {
@@ -38,12 +59,6 @@ public class GitRepositoryDetailRepositoryFromGithub implements GitRepositoryDet
                     @Override
                     public void accept(RepositoryApi repositoryApi) {
                         Log.i(TAG, "Repository + " + repositoryApi.getName() + " obtained from User " + user);
-                    }
-                })
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() {
-                        Log.i(TAG, "Repository " + repositoryName + " obtained from User " + user);
                     }
                 });
     }

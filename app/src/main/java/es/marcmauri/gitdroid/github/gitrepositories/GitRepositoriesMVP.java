@@ -9,8 +9,6 @@ import io.reactivex.Observable;
 public interface GitRepositoriesMVP {
 
     interface View {
-        void setAvatar(String url);
-        void setUsername(String username);
 
         void addRepository(GitRepositoryBasicModel repository);
         void removeAllRepositories();
@@ -19,13 +17,11 @@ public interface GitRepositoriesMVP {
         void hideProgress();
         void showSnackBar(String message);
 
-        Bundle getExtras();
         void navigateToNextActivity(Intent i);
     }
 
     interface Presenter {
-        void recoverUserDetails();
-        void loadRepositories();
+        void loadPublicRepositories();
         void loadRepositoryDetails(GitRepositoryBasicModel repository);
 
         void onRecyclerViewScrolled(int visibleItemCount, int totalItemCount, int pastVisibleItems, int dy);
@@ -36,6 +32,6 @@ public interface GitRepositoriesMVP {
     }
 
     interface Model {
-        Observable<GitRepositoryBasicModel> getGitRepositories(String username, int page);
+        Observable<GitRepositoryBasicModel> getGitPublicRepositories(long idLastRepoSeen);
     }
 }

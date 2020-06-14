@@ -10,9 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 import es.marcmauri.gitdroid.R;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
@@ -56,8 +54,7 @@ public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepository
 
         private CardView cardviewItem;
         private TextView tvRepoName;
-        private TextView tvRepoCreatedAt;
-        private TextView tvRepoUpdatedAt;
+        private TextView tvOwnerName;
         private TextView tvRepoDescription;
 
         public RepositoryListItemViewHolder(@NonNull View itemView) {
@@ -65,8 +62,7 @@ public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepository
 
             this.cardviewItem = itemView.findViewById(R.id.cardview_repository_item);
             this.tvRepoName = itemView.findViewById(R.id.tv_repository_name);
-            this.tvRepoCreatedAt = itemView.findViewById(R.id.tv_repository_created_at);
-            this.tvRepoUpdatedAt = itemView.findViewById(R.id.tv_repository_updated_at);
+            this.tvOwnerName = itemView.findViewById(R.id.tv_repository_owner_name);
             this.tvRepoDescription = itemView.findViewById(R.id.tv_repository_description);
         }
 
@@ -74,15 +70,14 @@ public class GitRepositoryListAdapter extends RecyclerView.Adapter<GitRepository
             // Set texts on recycler item
             this.tvRepoName.setText(currentRepository.getName());
             this.tvRepoDescription.setText(currentRepository.getDescription());
+            this.tvOwnerName.setText(currentRepository.getOwnerName());
 
             // Set dates on recycler item
-            SimpleDateFormat dateFormat = new SimpleDateFormat("d MMM yyyy", Locale.getDefault());
-            String createdAt = dateFormat.format(currentRepository.getCreatedAt());
-            String updatedAt = dateFormat.format(currentRepository.getUpdatedAt());
-            this.tvRepoCreatedAt.setText(String.format("Created at:  %s", createdAt));
-            this.tvRepoUpdatedAt.setText(String.format("Updated at:  %s", updatedAt));
-
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("d MMM yyyy", Locale.getDefault());
+            //String createdAt = (currentRepository.getCreatedAt() != null) ? dateFormat.format(currentRepository.getCreatedAt()) : "";
+            //String updatedAt = (currentRepository.getUpdatedAt() != null) ? dateFormat.format(currentRepository.getUpdatedAt()) : "";
             // Set on recycler item click listener
+
             this.cardviewItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

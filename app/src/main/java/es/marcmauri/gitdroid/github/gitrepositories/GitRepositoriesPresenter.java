@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import es.marcmauri.gitdroid.common.ExtraTags;
 import es.marcmauri.gitdroid.github.gitrepositorydetail.GitRepositoryDetailActivity;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
-import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -21,8 +20,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
     private static final String TAG = GitRepositoriesPresenter.class.getName();
 
-    private GitUserModel gitUserModel = null;
-    private int lastReposPage = 0;
+    private long idLastRepoSeen = 0;
     private boolean loadingPage = false;
     private boolean allPagesRetrieved = false;
 
@@ -34,25 +32,6 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
     public GitRepositoriesPresenter(GitRepositoriesMVP.Model model) {
         this.model = model;
-    }
-
-    @Override
-    public void recoverUserDetails() {
-        Log.i(TAG, "recoverUserDetails() has called");
-        if (view != null) {
-            if (gitUserModel == null) {
-                Log.i(TAG, "Git user details is null. We try to get it from view extras");
-                gitUserModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_USER);
-            }
-            if (gitUserModel != null) {
-                Log.i(TAG, "Git user details have gotten successfully");
-                view.setAvatar(gitUserModel.getAvatarUrl());
-                view.setUsername(gitUserModel.getUsername());
-            } else {
-                Log.e(TAG, "Git user details have not been recovered");
-                view.showSnackBar("TODO: No se han podido recuperar los datos de usuario");
-            }
-        }
     }
 
     private void getNextGitRepositoriesPage() {
@@ -67,7 +46,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                     view.showProgress();
                 }
 
-                getDataSubscription = model.getGitRepositories(gitUserModel.getUsername(), ++lastReposPage)
+                getDataSubscription = model.getGitPublicRepositories(idLastRepoSeen)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .switchIfEmpty(new Observable<GitRepositoryBasicModel>() {
@@ -87,6 +66,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                             public void onNext(GitRepositoryBasicModel repository) {
                                 Log.i(TAG, "Git repository fetched: " + repository.getName());
                                 if (view != null) {
+                                    idLastRepoSeen = repository.getId();
                                     view.addRepository(repository);
                                 }
                             }
@@ -97,7 +77,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                                 if (view != null) {
                                     view.removeAllRepositories();
                                     view.hideProgress();
-                                    view.showSnackBar("No public repositories found from " + gitUserModel.getUsername());
+                                    view.showSnackBar("No public repositories found");
                                     allPagesRetrieved = true;
                                     loadingPage = false;
                                 }
@@ -108,7 +88,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                                 Log.i(TAG, "All repositories fetched from current call");
                                 if (view != null) {
                                     view.hideProgress();
-                                    view.showSnackBar("Repositories from page " + lastReposPage + " fetched successfully!");
+                                    view.showSnackBar("Repositories till ID " + idLastRepoSeen + " fetched successfully!");
                                     loadingPage = false;
                                 }
                             }
@@ -124,47 +104,24 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
     }
 
     @Override
-    public void loadRepositories() {
+    public void loadPublicRepositories() {
         Log.i(TAG, "loadRepositories() has called");
 
         if (view != null) {
             view.showProgress();
         }
 
-        if (gitUserModel == null) {
-            recoverUserDetails();
-        }
-
-        if (gitUserModel != null) {
-            getNextGitRepositoriesPage();
-
-        } else {
-            Log.e(TAG, "Git user details have not been recovered");
-            if (view != null) {
-                view.hideProgress();
-                view.showSnackBar("TODO: No se han podido recuperar los repositorios porque el usuario no se encuentra disponible");
-            }
-        }
+        getNextGitRepositoriesPage();
     }
 
     @Override
     public void loadRepositoryDetails(GitRepositoryBasicModel repository) {
         Log.i(TAG, "loadRepositoryDetails() repository.name = " + repository.getName());
 
-        if (gitUserModel == null) {
-            recoverUserDetails();
-        }
-
         if (view != null) {
-            if (gitUserModel != null) {
-                Intent intentToRepoDetail = new Intent((Context) view, GitRepositoryDetailActivity.class);
-                intentToRepoDetail.putExtra(ExtraTags.EXTRA_GIT_USER, gitUserModel);
-                intentToRepoDetail.putExtra(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC, repository);
-                view.navigateToNextActivity(intentToRepoDetail);
-            } else {
-                Log.e(TAG, "Git user details have not been recovered");
-                view.showSnackBar("TODO: No se puede cargar el detalle del repositorio porque el usuario no esta disponible");
-            }
+            Intent intentToRepoDetail = new Intent((Context) view, GitRepositoryDetailActivity.class);
+            intentToRepoDetail.putExtra(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC, repository);
+            view.navigateToNextActivity(intentToRepoDetail);
         }
     }
 
@@ -173,7 +130,10 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
         if (dy > 0) {
             if ((totalItemCount - visibleItemCount <= pastVisibleItems)) {
                 if (view != null) {
+                    Log.i(TAG, "onRecyclerViewScrolled()");
+
                     getNextGitRepositoriesPage();
+
                 }
             }
         }
@@ -188,9 +148,10 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
         // TODO: Guardar en bundle para recuperar el estado una vez volvamos del detalle
         Log.i(TAG, "Then the pages controller must be restored as defaults");
-        lastReposPage = 0;
+        idLastRepoSeen = 0;
         loadingPage = false;
         allPagesRetrieved = false;
+
     }
 
     @Override

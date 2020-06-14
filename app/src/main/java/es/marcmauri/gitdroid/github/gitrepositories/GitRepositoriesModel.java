@@ -19,41 +19,36 @@ public class GitRepositoriesModel implements GitRepositoriesMVP.Model, Function<
         this.repository = repository;
     }
 
-    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromUser(String username, int page) {
-        return repository.getGitRepositoriesFromUser(username, page).flatMap(this);
-    }
-
-    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromOrganization(String org, int page) {
-        return repository.getGitRepositoriesFromOrganization(org, page).flatMap(this);
-    }
-
     @Override
     public Observable<GitRepositoryBasicModel> apply(RepositoryApi repositoryApi) {
+        String owner = "";
+        if (repositoryApi.getOwner() != null) {
+            String ownerApi = repositoryApi.getOwner().getLogin();
+            if (ownerApi != null) {
+                Log.i(TAG, "Owner username fetched from Repository details. Owner user is " + ownerApi);
+                owner = ownerApi;
+            }
+        }
+
         GitRepositoryBasicModel gitRepositoryBasicModel =
                 new GitRepositoryBasicModel(
                         repositoryApi.getId(),
                         repositoryApi.getName(),
                         repositoryApi.getFullName(),
                         repositoryApi.getDescription(),
-                        repositoryApi.getCreatedAt(),
-                        repositoryApi.getUpdatedAt());
+                        owner);
 
         return Observable.just(gitRepositoryBasicModel);
     }
 
+    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromAllGitPublics(long idLastRepoSeen) {
+        return repository.getGitPublicRepositories(idLastRepoSeen).flatMap(this);
+    }
+
     @Override
-    public Observable<GitRepositoryBasicModel> getGitRepositories(final String user, final int page) {
-        Log.e(TAG, "getGitRepositories(user= " + user + ", page= " + page + ")");
-        return getGitRepositoriesFromUser(user, page)
-                .onErrorResumeNext(new Function<Throwable, Observable<GitRepositoryBasicModel>>() {
-                    @Override
-                    public Observable<GitRepositoryBasicModel> apply(Throwable throwable) {
-                        Log.w(TAG, "Repositories from Username not found, " +
-                                "then we try to get repositories from Organization. " +
-                                "User = " + user + ", Page = " + page);
-                        return getGitRepositoriesFromOrganization(user, page);
-                    }
-                })
+    public Observable<GitRepositoryBasicModel> getGitPublicRepositories(final long idLastRepoSeen) {
+        Log.e(TAG, "getGitRepositoriesFromPublic(idLastRepoSeen= " + idLastRepoSeen + ")");
+        return getGitRepositoriesFromAllGitPublics(idLastRepoSeen)
                 .doOnError(new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) {
