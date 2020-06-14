@@ -1,7 +1,9 @@
 package es.marcmauri.gitdroid.github.gitrepositories;
 
 import android.content.Intent;
-import android.os.Bundle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import io.reactivex.Observable;
@@ -9,15 +11,26 @@ import io.reactivex.Observable;
 public interface GitRepositoriesMVP {
 
     interface View {
-
-        void addRepository(GitRepositoryBasicModel repository);
+        void setRepositoryItems(List<GitRepositoryBasicModel> repositories);
+        void addRepositoryItem(GitRepositoryBasicModel repository);
         void removeAllRepositories();
+        void setRepositoryPosition(int position);
 
         void showProgress();
         void hideProgress();
         void showSnackBar(String message);
 
         void navigateToNextActivity(Intent i);
+    }
+
+    interface State {
+        ArrayList<GitRepositoryBasicModel> getRepositoryItems();
+        int getRepositoryPosition();
+        int getCurrentPage();
+        long getRepositoryLastSeenId();
+        boolean getAllPagesRetrieved();
+        boolean getSearchingReposByName();
+        String getSearchQuery();
     }
 
     interface Presenter {
@@ -27,9 +40,11 @@ public interface GitRepositoriesMVP {
         void onSearchFieldChanges(String query);
         void onRecyclerViewScrolled(int visibleItemCount, int totalItemCount, int pastVisibleItems, int dy);
 
-        void rxJavaUnsubscribe();
+        GitRepositoriesMVP.State getState();
+        void onRepositoryPositionChange(int position);
 
-        void setView(GitRepositoriesMVP.View view);
+        void unsubscribe();
+        void subscribe(GitRepositoriesMVP.View view, GitRepositoriesMVP.State state);
     }
 
     interface Model {

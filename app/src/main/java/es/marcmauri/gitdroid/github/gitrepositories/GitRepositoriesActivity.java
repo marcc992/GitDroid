@@ -7,11 +7,10 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -33,6 +32,14 @@ import es.marcmauri.gitdroid.root.App;
 public class GitRepositoriesActivity extends AppCompatActivity implements GitRepositoriesMVP.View {
 
     private final String TAG = GitRepositoriesActivity.class.getName();
+
+    private final String BUNDLE_TAG_REPOSITORY_ITEMS = "bundle.repository.items";
+    private final String BUNDLE_TAG_REPOSITORY_POSITION = "bundle.repository.position";
+    private final String BUNDLE_TAG_CURRENT_PAGE = "bundle.current.page";
+    private final String BUNDLE_TAG_REPO_LAST_SEEN_ID = "bundle.repository.last.seen.id";
+    private final String BUNDLE_TAG_ALL_PAGES_RETRIEVED = "bundle.all.pages.retrieved";
+    private final String BUNDLE_TAG_SEARCHING_REPOS_BY_NAME = "bundle.searching.repositories.by.name";
+    private final String BUNDLE_TAG_REPOSITORY_SEARCH_QUERY = "bundle.search.query";
 
     @Inject
     GitRepositoriesMVP.Presenter presenter;
@@ -66,12 +73,29 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     }
 
     @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        Log.i(TAG, "onPostCreate()");
+
+        // Pass state when subscribing; it can be null.
+        presenter.subscribe(this, readFromBundle(savedInstanceState));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSaveInstanceState()");
+
+        writeToBundle(outState, presenter.getState());
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume()");
 
-        presenter.setView(this);
-        presenter.loadPublicRepositories();
+        //presenter.setView(this);
+        //presenter.loadPublicRepositories();
     }
 
     @Override
@@ -79,12 +103,65 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         super.onStop();
         Log.i(TAG, "onStop()");
 
-        presenter.rxJavaUnsubscribe();
-        removeAllRepositories();
+        //presenter.unsubscribe();
+        //removeAllRepositories();
     }
 
     @Override
-    public void addRepository(GitRepositoryBasicModel repository) {
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy()");
+        presenter.unsubscribe();
+    }
+
+    private void writeToBundle(@NonNull Bundle outState, GitRepositoriesMVP.State state) {
+        Log.i(TAG, "writeToBundle() called");
+
+        outState.putParcelableArrayList(BUNDLE_TAG_REPOSITORY_ITEMS, state.getRepositoryItems());
+        outState.putInt(BUNDLE_TAG_REPOSITORY_POSITION, state.getRepositoryPosition());
+        outState.putInt(BUNDLE_TAG_CURRENT_PAGE, state.getCurrentPage());
+        outState.putLong(BUNDLE_TAG_REPO_LAST_SEEN_ID, state.getRepositoryLastSeenId());
+        outState.putBoolean(BUNDLE_TAG_ALL_PAGES_RETRIEVED, state.getAllPagesRetrieved());
+        outState.putBoolean(BUNDLE_TAG_SEARCHING_REPOS_BY_NAME, state.getSearchingReposByName());
+        outState.putString(BUNDLE_TAG_REPOSITORY_SEARCH_QUERY, state.getSearchQuery());
+    }
+
+    private GitRepositoriesMVP.State readFromBundle(@Nullable Bundle bundle) {
+        if (bundle == null) {
+            Log.i(TAG, "readFromBundle() bundle is NULL");
+            return null;
+        } else {
+            Log.i(TAG, "readFromBundle() bundle has data");
+
+            try {
+                ArrayList<GitRepositoryBasicModel> lastRepoItems = bundle.getParcelableArrayList(BUNDLE_TAG_REPOSITORY_ITEMS);
+
+                return new GitRepositoriesState(
+                        lastRepoItems,
+                        bundle.getInt(BUNDLE_TAG_REPOSITORY_POSITION),
+                        bundle.getInt(BUNDLE_TAG_CURRENT_PAGE),
+                        bundle.getLong(BUNDLE_TAG_REPO_LAST_SEEN_ID),
+                        bundle.getBoolean(BUNDLE_TAG_ALL_PAGES_RETRIEVED),
+                        bundle.getBoolean(BUNDLE_TAG_SEARCHING_REPOS_BY_NAME),
+                        bundle.getString(BUNDLE_TAG_REPOSITORY_SEARCH_QUERY));
+            } catch (Exception e) {
+                Log.e(TAG, "One or more Status values from bundle are null or has some problem.");
+                Log.e(TAG, e.getMessage(), e);
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public void setRepositoryItems(List<GitRepositoryBasicModel> repositories) {
+        Log.i(TAG, "setRepositoryItems() #repos: " + repositories.size());
+        repositoryList.clear();
+        repositoryList.addAll(repositories);
+        repositoryListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void addRepositoryItem(GitRepositoryBasicModel repository) {
         Log.i(TAG, "addRepository() repository.name = " + repository.getName());
         repositoryList.add(repository);
         repositoryListAdapter.notifyItemChanged(repositoryList.size() - 1);
@@ -95,6 +172,14 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         Log.i(TAG, "removeAllRepositories()");
         repositoryList.clear();
         repositoryListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void setRepositoryPosition(int position) {
+        Log.i(TAG, "setRepositoryPosition(position= " + position + ")");
+        if (recyclerView.getLayoutManager() != null) {
+            recyclerView.getLayoutManager().scrollToPosition(position);
+        }
     }
 
     @Override
@@ -133,15 +218,20 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     private void behaviorUI() {
         etSearchQuery.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                presenter.onSearchFieldChanges(charSequence.toString());
+            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) { }
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                Log.d(TAG, "onTextChanged() start= " + start + ", before= " + before + ", count= " + count);
+                if (before != count) {
+                    presenter.onSearchFieldChanges(charSequence.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
         });
     }
 
@@ -169,6 +259,15 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
                 presenter.onRecyclerViewScrolled(
                         layoutManager.getChildCount(), layoutManager.getItemCount(),
                         layoutManager.findFirstVisibleItemPosition(), dy);
+            }
+
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    // Presenter notification when scroll is not moving
+                    presenter.onRepositoryPositionChange(layoutManager.findFirstVisibleItemPosition());
+                }
             }
         });
     }
