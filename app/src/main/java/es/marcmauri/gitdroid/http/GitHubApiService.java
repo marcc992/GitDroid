@@ -2,6 +2,7 @@ package es.marcmauri.gitdroid.http;
 
 import java.util.List;
 
+import es.marcmauri.gitdroid.http.apimodel.github.FoundRepositoriesApi;
 import es.marcmauri.gitdroid.http.apimodel.github.RepositoryApi;
 import es.marcmauri.gitdroid.http.apimodel.github.UserApi;
 import io.reactivex.Observable;
@@ -19,6 +20,13 @@ public interface GitHubApiService {
     @GET("repositories")
     Observable<List<RepositoryApi>> getPublicRepositories(
             @Query("since") long idLastRepoSeen
+    );
+
+    @GET("search/repositories")
+    Observable<FoundRepositoriesApi> getPublicRepositoriesByName(
+            @Query("q") String query,
+            @Query("page") int page,
+            @Query("per_page") int reposPerPage
     );
 
     @GET("repos/{user}/{repositoryName}")

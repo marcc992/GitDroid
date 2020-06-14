@@ -2,8 +2,11 @@ package es.marcmauri.gitdroid.github.gitrepositories;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -35,8 +38,7 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     GitRepositoriesMVP.Presenter presenter;
 
     private ConstraintLayout rootView;
-    private TextView tvUsername;
-    private ImageView ivUserAvatar;
+    private EditText etSearchQuery;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
 
@@ -55,6 +57,9 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
 
         // Vinculamos la Vista al Activity
         bindUI();
+
+        // Dotamos comportamiento a la vista
+        behaviorUI();
 
         // Configuramos el recyclerview con el adapter
         setRecyclerView();
@@ -119,11 +124,25 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     private void bindUI() {
         Log.i(TAG, "bindUI()");
         rootView = findViewById(R.id.activity_git_repositories_root_view);
-        tvUsername = findViewById(R.id.tv_username);
-        ivUserAvatar = findViewById(R.id.iv_user_avatar);
+        etSearchQuery = findViewById(R.id.et_search_query);
         recyclerView = findViewById(R.id.recyclerView_git_repositories);
         progressBar = findViewById(R.id.progressBar_git_repositories);
 
+    }
+
+    private void behaviorUI() {
+        etSearchQuery.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                presenter.onSearchFieldChanges(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) { }
+        });
     }
 
     private void setRecyclerView() {

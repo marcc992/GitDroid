@@ -1,10 +1,12 @@
 <resources>
-    <string name="app_name">GitDroid</string>
-    <string name="text_general_github_my_user_account">marcc992</string>
+    <string translatable="false" name="app_name">GitDroid</string>
+    <string translatable="false" name="text_general_github_my_user_account">marcc992</string>
+    <string translatable="false" name="text_general_github_current_project">GitDroid</string>
     <string name="text_general_app_description">Searching repositories from GitHub has never been so easy.\n\nYou just need to put an actual username below an press on Get Repos!</string>
     <string name="button_get_repos">Get Repos!</string>
     <string name="content_description_image_user_avatar">Selected Git user avatar</string>
     <string name="text_repository_selected">Repository:</string>
     <string name="text_header_all_public_repositories">All public repositories</string>
     <string name="text_owner_is">Owner:</string>
+    <string name="text_search_query">Search:</string>
 </resources>

@@ -24,6 +24,7 @@ public interface GitRepositoriesMVP {
         void loadPublicRepositories();
         void loadRepositoryDetails(GitRepositoryBasicModel repository);
 
+        void onSearchFieldChanges(String query);
         void onRecyclerViewScrolled(int visibleItemCount, int totalItemCount, int pastVisibleItems, int dy);
 
         void rxJavaUnsubscribe();
@@ -32,6 +33,7 @@ public interface GitRepositoriesMVP {
     }
 
     interface Model {
-        Observable<GitRepositoryBasicModel> getGitPublicRepositories(long idLastRepoSeen);
+        Observable<GitRepositoryBasicModel> getGitPublicRepositories(final long idLastRepoSeen);
+        Observable<GitRepositoryBasicModel> getGitPublicRepositoriesByName(final String query, final int page);
     }
 }

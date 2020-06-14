@@ -3,15 +3,17 @@ package es.marcmauri.gitdroid.github.gitrepositories;
 import android.util.Log;
 
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
+import es.marcmauri.gitdroid.http.apimodel.github.Owner;
 import es.marcmauri.gitdroid.http.apimodel.github.RepositoryApi;
+import es.marcmauri.gitdroid.http.apimodel.github.RepositoryItemApi;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-public class GitRepositoriesModel implements GitRepositoriesMVP.Model, Function<RepositoryApi, ObservableSource<? extends GitRepositoryBasicModel>> {
+public class GitRepositoriesModel implements GitRepositoriesMVP.Model {
 
     private static final String TAG = GitRepositoriesModel.class.getName();
+    private static final int REPOS_PER_PAGE = 20;
 
     private GitRepositoriesRepository repository;
 
@@ -19,36 +21,53 @@ public class GitRepositoriesModel implements GitRepositoriesMVP.Model, Function<
         this.repository = repository;
     }
 
-    @Override
-    public Observable<GitRepositoryBasicModel> apply(RepositoryApi repositoryApi) {
-        String owner = "";
-        if (repositoryApi.getOwner() != null) {
-            String ownerApi = repositoryApi.getOwner().getLogin();
-            if (ownerApi != null) {
-                Log.i(TAG, "Owner username fetched from Repository details. Owner user is " + ownerApi);
-                owner = ownerApi;
-            }
+    private String getOwnerName(Owner owner) {
+        if (owner != null && owner.getLogin() != null) {
+            return owner.getLogin();
+        } else {
+            return "";
         }
-
-        GitRepositoryBasicModel gitRepositoryBasicModel =
-                new GitRepositoryBasicModel(
-                        repositoryApi.getId(),
-                        repositoryApi.getName(),
-                        repositoryApi.getFullName(),
-                        repositoryApi.getDescription(),
-                        owner);
-
-        return Observable.just(gitRepositoryBasicModel);
-    }
-
-    private Observable<GitRepositoryBasicModel> getGitRepositoriesFromAllGitPublics(long idLastRepoSeen) {
-        return repository.getGitPublicRepositories(idLastRepoSeen).flatMap(this);
     }
 
     @Override
     public Observable<GitRepositoryBasicModel> getGitPublicRepositories(final long idLastRepoSeen) {
-        Log.e(TAG, "getGitRepositoriesFromPublic(idLastRepoSeen= " + idLastRepoSeen + ")");
-        return getGitRepositoriesFromAllGitPublics(idLastRepoSeen)
+        Log.i(TAG, "getGitRepositoriesFromPublic(idLastRepoSeen= " + idLastRepoSeen + ")");
+        return repository.getGitPublicRepositories(idLastRepoSeen)
+                .flatMap(new Function<RepositoryApi, Observable<GitRepositoryBasicModel>>() {
+                    @Override
+                    public Observable<GitRepositoryBasicModel> apply(RepositoryApi repositoryApi) throws Exception {
+                        return Observable.just(
+                                new GitRepositoryBasicModel(
+                                        repositoryApi.getId(),
+                                        repositoryApi.getName(),
+                                        repositoryApi.getFullName(),
+                                        repositoryApi.getDescription(),
+                                        getOwnerName(repositoryApi.getOwner())));
+                    }
+                }).doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        Log.e(TAG, throwable.getMessage(), throwable);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<GitRepositoryBasicModel> getGitPublicRepositoriesByName(String query, int page) {
+        Log.i(TAG, "getGitPublicRepositoriesByName(query= " + query + ", page= " + page + ")");
+        return repository.getGitPublicRepositoriesByName(query, page, REPOS_PER_PAGE)
+                .flatMap(new Function<RepositoryItemApi, Observable<GitRepositoryBasicModel>>() {
+                    @Override
+                    public Observable<GitRepositoryBasicModel> apply(RepositoryItemApi repositoryItemApi) {
+                        return Observable.just(
+                                new GitRepositoryBasicModel(
+                                        repositoryItemApi.getId(),
+                                        repositoryItemApi.getName(),
+                                        repositoryItemApi.getFullName(),
+                                        repositoryItemApi.getDescription(),
+                                        getOwnerName(repositoryItemApi.getOwner())));
+                    }
+                })
                 .doOnError(new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) {

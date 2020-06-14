@@ -20,9 +20,16 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
     private static final String TAG = GitRepositoriesPresenter.class.getName();
 
-    private long idLastRepoSeen = 0;
     private boolean loadingPage = false;
     private boolean allPagesRetrieved = false;
+
+    // Control values
+    // All repositories
+    private long idLastRepoSeen = 0;
+    // Repositories by name
+    private boolean searchingReposByName = false;
+    private String searchQuery = "";
+    private int currentPage = 0;
 
     @Nullable
     private GitRepositoriesMVP.View view;
@@ -46,7 +53,14 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                     view.showProgress();
                 }
 
-                getDataSubscription = model.getGitPublicRepositories(idLastRepoSeen)
+                Observable<GitRepositoryBasicModel> observable;
+                if (searchingReposByName) {
+                    observable = model.getGitPublicRepositoriesByName(searchQuery, ++currentPage);
+                } else {
+                    observable = model.getGitPublicRepositories(idLastRepoSeen);
+                }
+
+                getDataSubscription = observable
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .switchIfEmpty(new Observable<GitRepositoryBasicModel>() {
@@ -88,7 +102,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                                 Log.i(TAG, "All repositories fetched from current call");
                                 if (view != null) {
                                     view.hideProgress();
-                                    view.showSnackBar("Repositories till ID " + idLastRepoSeen + " fetched successfully!");
+                                    view.showSnackBar("Repositories fetched successfully!");
                                     loadingPage = false;
                                 }
                             }
@@ -126,6 +140,39 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
     }
 
     @Override
+    public void onSearchFieldChanges(String query) {
+        Log.i(TAG, "onSearchFieldChanges(query= " + query + ")");
+
+        // Set all control values as default
+        allPagesRetrieved = false;
+        loadingPage = false;
+        currentPage = 0;
+        idLastRepoSeen = 0;
+
+        // Dispose the current data subscription because we do not want this anymore, then we will make a new one
+        if (getDataSubscription != null && !getDataSubscription.isDisposed()) {
+            getDataSubscription.dispose();
+        }
+
+        // Clean current repository items on the recyclerview
+        if (view != null) {
+            view.removeAllRepositories();
+        }
+
+        // Check if query to search
+        if (query != null && !query.isEmpty()) {
+            searchingReposByName = true;
+            searchQuery = query;
+        } else {
+            searchingReposByName = false;
+            searchQuery = "";
+        }
+
+        // Search new page about whatever
+        getNextGitRepositoriesPage();
+    }
+
+    @Override
     public void onRecyclerViewScrolled(int visibleItemCount, int totalItemCount, int pastVisibleItems, int dy) {
         if (dy > 0) {
             if ((totalItemCount - visibleItemCount <= pastVisibleItems)) {
@@ -148,10 +195,17 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
         // TODO: Guardar en bundle para recuperar el estado una vez volvamos del detalle
         Log.i(TAG, "Then the pages controller must be restored as defaults");
-        idLastRepoSeen = 0;
+
+        // Control values
         loadingPage = false;
         allPagesRetrieved = false;
 
+        // All repos default values
+        idLastRepoSeen = 0;
+        // Repos by name default values
+        searchingReposByName = false;
+        searchQuery = "";
+        currentPage = 0;
     }
 
     @Override
