@@ -1,12 +1,9 @@
 package es.marcmauri.gitdroid.github.gitmain;
 
-import android.content.Intent;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.only;

@@ -12,11 +12,13 @@ public class GitRepositoryDetailModule {
         return new GitRepositoryDetailPresenter(model);
     }
 
-    @Provides GitRepositoryDetailMVP.Model provideGitRepositoryDetailModel(GitRepositoryDetailRepository repository) {
+    @Provides
+    GitRepositoryDetailMVP.Model provideGitRepositoryDetailModel(GitRepositoryDetailRepository repository) {
         return new GitRepositoryDetailModel(repository);
     }
 
-    @Provides GitRepositoryDetailRepository provideGitRepositoryDetailRepository(GitHubApiService gitHubApiService) {
+    @Provides
+    GitRepositoryDetailRepository provideGitRepositoryDetailRepository(GitHubApiService gitHubApiService) {
         return new GitRepositoryDetailRepositoryFromGithub(gitHubApiService);
     }
 }

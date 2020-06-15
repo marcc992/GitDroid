@@ -7,5 +7,6 @@ import io.reactivex.Observable;
 public interface GitRepositoryDetailRepository {
 
     Observable<UserApi> getGitUserDetails(String username);
+
     Observable<RepositoryApi> getGitRepositoryDetail(final String user, final String repositoryName);
 }

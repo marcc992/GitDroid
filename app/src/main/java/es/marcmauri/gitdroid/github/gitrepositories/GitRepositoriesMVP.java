@@ -1,7 +1,5 @@
 package es.marcmauri.gitdroid.github.gitrepositories;
 
-import android.content.Intent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public interface GitRepositoriesMVP {
         void hideProgress();
         void showSnackBar(String message);
 
-        void navigateToNextActivity(Intent i);
+        void goToGitRepositoryDetail(GitRepositoryBasicModel repo, String tagKeyToPutInExtras);
     }
 
     interface State {
@@ -43,8 +41,9 @@ public interface GitRepositoriesMVP {
         GitRepositoriesMVP.State getState();
         void onRepositoryPositionChange(int position);
 
+        void subscribe(GitRepositoriesMVP.View view);
+        void subscribeAndRestoreState(GitRepositoriesMVP.View view, GitRepositoriesMVP.State state);
         void unsubscribe();
-        void subscribe(GitRepositoriesMVP.View view, GitRepositoriesMVP.State state);
     }
 
     interface Model {

@@ -1,7 +1,5 @@
 package es.marcmauri.gitdroid.github.gitmain;
 
-import android.content.Intent;
-
 public interface GitMainMVP {
 
     interface View {

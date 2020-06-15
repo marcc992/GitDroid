@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import es.marcmauri.gitdroid.R;
+import es.marcmauri.gitdroid.github.gitrepositorydetail.GitRepositoryDetailActivity;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import es.marcmauri.gitdroid.root.App;
 
@@ -78,7 +79,15 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
         Log.i(TAG, "onPostCreate()");
 
         // Pass state when subscribing; it can be null.
-        presenter.subscribe(this, readFromBundle(savedInstanceState));
+        GitRepositoriesMVP.State stateFromBundle = readFromBundle(savedInstanceState);
+        if (stateFromBundle != null) {
+            Log.i(TAG, "onPostCreate() -> stateFromBundle is VALID!");
+            presenter.subscribeAndRestoreState(this, stateFromBundle);
+        } else {
+            Log.i(TAG, "onPostCreate() -> stateFromBundle is NULL!");
+            presenter.subscribe(this);
+            presenter.loadPublicRepositories();
+        }
     }
 
     @Override
@@ -201,9 +210,11 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     }
 
     @Override
-    public void navigateToNextActivity(Intent i) {
-        Log.i(TAG, "navigateToNextActivity()");
-        startActivity(i);
+    public void goToGitRepositoryDetail(GitRepositoryBasicModel repo, String tagKeyToPutInExtras) {
+        Log.i(TAG, "goToGitRepositoryDetail(repo, extrasKey)");
+        Intent intentToRepoDetail = new Intent(this, GitRepositoryDetailActivity.class);
+        intentToRepoDetail.putExtra(tagKeyToPutInExtras, repo);
+        startActivity(intentToRepoDetail);
     }
 
     private void bindUI() {

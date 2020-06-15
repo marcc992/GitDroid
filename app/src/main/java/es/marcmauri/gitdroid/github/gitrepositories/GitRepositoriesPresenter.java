@@ -1,15 +1,13 @@
 package es.marcmauri.gitdroid.github.gitrepositories;
 
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
 import es.marcmauri.gitdroid.common.ExtraTags;
-import es.marcmauri.gitdroid.github.gitrepositorydetail.GitRepositoryDetailActivity;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -66,9 +64,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
         Log.i(TAG, "loadRepositoryDetails() repository.name = " + repository.getName());
 
         if (view != null) {
-            Intent intentToRepoDetail = new Intent((Context) view, GitRepositoryDetailActivity.class);
-            intentToRepoDetail.putExtra(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC, repository);
-            view.navigateToNextActivity(intentToRepoDetail);
+            view.goToGitRepositoryDetail(repository, ExtraTags.EXTRA_GIT_REPOSITORY_BASIC);
         }
     }
 
@@ -151,33 +147,33 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
      * NEW METHODS
      */
     @Override
-    public void subscribe(GitRepositoriesMVP.View view, GitRepositoriesMVP.State state) {
-        Log.i(TAG, "setView(view) called with state");
+    public void subscribe(GitRepositoriesMVP.View view) {
+        Log.i(TAG, "subscribe(view) called. loadPublicRepositories() must be called from the view");
+        this.view = view;
+        this.repositoryItems = new ArrayList<>();
+    }
+
+    @Override
+    public void subscribeAndRestoreState(GitRepositoriesMVP.View view, @NonNull GitRepositoriesMVP.State state) {
+        Log.i(TAG, "subscribeAndRestoreState(view). Last data will be shown");
         this.view = view;
 
         this.repositoryItems = new ArrayList<>();
 
-        // If there are retrieved items, get them from the state
-        if (state != null) {
-            Log.i(TAG, "setView(view) called with state NOT NULL. Retrieving data...");
-            repositoryItems = state.getRepositoryItems();
-            repositoryPosition = state.getRepositoryPosition();
-            currentPage = state.getCurrentPage();
-            repositoryLastSeenId = state.getRepositoryLastSeenId();
-            allPagesRetrieved = state.getAllPagesRetrieved();
-            searchingReposByName = state.getSearchingReposByName();
-            searchQuery = state.getSearchQuery();
+        // There are retrieved items, get them from the state
+        repositoryItems = state.getRepositoryItems();
+        repositoryPosition = state.getRepositoryPosition();
+        currentPage = state.getCurrentPage();
+        repositoryLastSeenId = state.getRepositoryLastSeenId();
+        allPagesRetrieved = state.getAllPagesRetrieved();
+        searchingReposByName = state.getSearchingReposByName();
+        searchQuery = state.getSearchQuery();
 
-            //  Set items on the view
-            if (view != null) {
-                Log.i(TAG, "setView(view) called with state -02");
-                view.setRepositoryItems(repositoryItems);
-                view.setRepositoryPosition(repositoryPosition);
-            }
-
-        } else {
-            // If there are no retrieved items, get them from the model
-            loadPublicRepositories();
+        //  Set items on the view
+        if (view != null) {
+            Log.i(TAG, "setView(view) called with state -02");
+            view.setRepositoryItems(repositoryItems);
+            view.setRepositoryPosition(repositoryPosition);
         }
     }
 
