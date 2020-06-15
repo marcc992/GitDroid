@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import javax.inject.Inject;
 
 import es.marcmauri.gitdroid.R;
+import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import es.marcmauri.gitdroid.root.App;
 
 public class GitRepositoryDetailActivity extends AppCompatActivity implements GitRepositoryDetailMVP.View {
@@ -102,21 +103,32 @@ public class GitRepositoryDetailActivity extends AppCompatActivity implements Gi
     }
 
     @Override
-    public void showSnackBar(String message) {
+    public void showUserError() {
+        showSnackBar(getString(R.string.error_network_not_found_user_data));
+    }
+
+    @Override
+    public void showRepositoryError() {
+        showSnackBar(getString(R.string.error_network_not_found_repository_data));
+    }
+
+    private void showSnackBar(String message) {
         Log.i(TAG, "showSnackBar() msg: " + message);
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
-    public Bundle getExtras() {
-        Log.i(TAG, "getExtras()");
-        if (getIntent() != null) {
-            Log.i(TAG, "getIntent() is not null, we try to return getIntent().getExtras()");
-            return getIntent().getExtras();
+    public GitRepositoryBasicModel getRepositoryBasicModelFromExtras(String key) {
+        Log.i(TAG, "getRepositoryBasicModelFromExtras()");
+        GitRepositoryBasicModel repository = null;
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            Log.i(TAG, "getRepositoryBasicModelFromExtras() is not null, " +
+                    "we try to return getIntent().getExtras().getParcelable(key)");
+            repository = getIntent().getExtras().getParcelable(key);
         } else {
-            Log.e(TAG, "getIntent() returns null");
-            return null;
+            Log.e(TAG, "getRepositoryBasicModelFromExtras() returns null");
         }
+        return repository;
     }
 
     private void bindUI() {

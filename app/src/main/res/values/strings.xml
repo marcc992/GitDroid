@@ -9,4 +9,7 @@
     <string name="text_header_all_public_repositories">All public repositories</string>
     <string name="text_owner_is">Owner:</string>
     <string name="text_search_query">Search:</string>
+    <string name="error_network_not_found_user_data">An error occurred fetching user data</string>
+    <string name="error_network_not_found_repository_data">An error occurred fetching repository data</string>
+    <string name="error_network_not_found_neither_user_repository_data">An error occurred fetching user and repository data</string>
 </resources>

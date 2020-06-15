@@ -8,7 +8,6 @@ import es.marcmauri.gitdroid.common.ExtraTags;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryBasicModel;
 import es.marcmauri.gitdroid.github.viewmodel.GitRepositoryDetailedModel;
 import es.marcmauri.gitdroid.github.viewmodel.GitUserModel;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -34,19 +33,6 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
         this.model = model;
     }
 
-
-    private void recoverBasicRepositoryDetails() {
-        Log.i(TAG, "recoverBasicRepositoryDetails() has called");
-        if (view != null) {
-            if (gitRepositoryBasicModel == null) {
-                Log.i(TAG, "Git repository basic details is null. We try to get it from view extras");
-                if (view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC) != null) {
-                    gitRepositoryBasicModel = view.getExtras().getParcelable(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC);
-                }
-            }
-        }
-    }
-
     @Override
     public void loadOwnerDetails() {
         Log.i(TAG, "loadOwnerDetails() has called");
@@ -57,7 +43,10 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
         }
 
         if (gitRepositoryBasicModel == null) {
-            recoverBasicRepositoryDetails();
+            if (view != null) {
+                gitRepositoryBasicModel =
+                        view.getRepositoryBasicModelFromExtras(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC);
+            }
         }
 
         if (gitRepositoryBasicModel != null) {
@@ -71,7 +60,7 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
                             loadingUserInfo = false;
 
                             if (view != null) {
-                                view.showSnackBar("Git User " + gitRepositoryBasicModel.getOwnerName() + " does not found!");
+                                view.showUserError();
 
                                 if (!loadingRepoInfo) {
                                     view.hideProgress();
@@ -102,7 +91,7 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
             Log.e(TAG, "Activity Extras / Bundle could not be fetched successfully...");
             if (view != null) {
                 view.hideProgress();
-                view.showSnackBar("TODO: No se han podido recuperar los datos del usuario y del repositorio seleccionado");
+                view.showUserError();
             }
         }
     }
@@ -117,7 +106,10 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
         }
 
         if (gitRepositoryBasicModel == null) {
-            recoverBasicRepositoryDetails();
+            if (view != null) {
+                gitRepositoryBasicModel =
+                        view.getRepositoryBasicModelFromExtras(ExtraTags.EXTRA_GIT_REPOSITORY_BASIC);
+            }
         }
 
         if (gitRepositoryBasicModel != null) {
@@ -131,7 +123,7 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
                             loadingRepoInfo = false;
 
                             if (view != null) {
-                                view.showSnackBar("The detailed " + gitRepositoryBasicModel.getName() + " does not found!");
+                                view.showRepositoryError();
 
                                 if (!loadingUserInfo) {
                                     view.hideProgress();
@@ -162,7 +154,7 @@ public class GitRepositoryDetailPresenter implements GitRepositoryDetailMVP.Pres
             Log.e(TAG, "Activity Extras / Bundle could not be fetched successfully...");
             if (view != null) {
                 view.hideProgress();
-                view.showSnackBar("TODO: No se han podido recuperar los datos del usuario y del repositorio seleccionado");
+                view.showRepositoryError();
             }
         }
 
