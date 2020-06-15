@@ -1,12 +1,8 @@
 package es.marcmauri.gitdroid.github.gitmain;
 
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-
-import es.marcmauri.gitdroid.github.gitrepositories.GitRepositoriesActivity;
 
 public class GitMainPresenter implements GitMainMVP.Presenter {
 
@@ -17,11 +13,10 @@ public class GitMainPresenter implements GitMainMVP.Presenter {
 
 
     @Override
-    public void goToPublicRepositories() {
+    public void loadPublicRepositories() {
         Log.i(TAG, "goToPublicRepositories() called");
         if (view != null) {
-            Intent intentToRepos = new Intent((Context) view, GitRepositoriesActivity.class);
-            view.navigateToNextActivity(intentToRepos);
+            view.goToGitRepositories();
         }
     }
 

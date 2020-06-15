@@ -1,5 +1,6 @@
 package es.marcmauri.gitdroid.github.gitmain;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar;
 import javax.inject.Inject;
 
 import es.marcmauri.gitdroid.R;
+import es.marcmauri.gitdroid.github.gitrepositories.GitRepositoriesActivity;
 import es.marcmauri.gitdroid.root.App;
 
 public class GitMainActivity extends AppCompatActivity implements GitMainMVP.View {
@@ -57,13 +59,9 @@ public class GitMainActivity extends AppCompatActivity implements GitMainMVP.Vie
     }
 
     @Override
-    public void showSnackBar(String message) {
-        Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void navigateToNextActivity(Intent i) {
-        startActivity(i);
+    public void goToGitRepositories() {
+        Intent intentToRepos = new Intent(this, GitRepositoriesActivity.class);
+        startActivity(intentToRepos);
     }
 
     private void bindUI() {
@@ -75,7 +73,7 @@ public class GitMainActivity extends AppCompatActivity implements GitMainMVP.Vie
         btnGetRepos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.goToPublicRepositories();
+                presenter.loadPublicRepositories();
             }
         });
     }

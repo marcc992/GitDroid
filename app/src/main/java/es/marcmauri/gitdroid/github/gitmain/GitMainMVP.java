@@ -5,13 +5,11 @@ import android.content.Intent;
 public interface GitMainMVP {
 
     interface View {
-        void showSnackBar(String message);
-
-        void navigateToNextActivity(Intent i);
+        void goToGitRepositories();
     }
 
     interface Presenter {
-        void goToPublicRepositories();
+        void loadPublicRepositories();
 
         void setView(GitMainMVP.View view);
     }
