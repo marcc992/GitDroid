@@ -16,7 +16,9 @@ public interface GitRepositoriesMVP {
 
         void showProgress();
         void hideProgress();
-        void showSnackBar(String message);
+        void showAllPagesRetrieved();
+        void showPublicRepositoriesNotFound();
+        void showRepositoryPageFetched();
 
         void goToGitRepositoryDetail(GitRepositoryBasicModel repo, String tagKeyToPutInExtras);
     }

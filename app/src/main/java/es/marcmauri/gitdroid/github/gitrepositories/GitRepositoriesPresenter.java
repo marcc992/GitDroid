@@ -20,28 +20,18 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
 
     private static final String TAG = GitRepositoriesPresenter.class.getName();
 
-
-    /*
-     * NEW VALUES
-     */
+    // Control values
+    // Persistence
     private ArrayList<GitRepositoryBasicModel> repositoryItems;
     private int repositoryPosition = 0;
-    /*
-     * NEW VALUES
-     */
-
-
     private boolean loadingPage = false;
     private boolean allPagesRetrieved = false;
-
-    // Control values
+    private int currentPage = 0;
     // All repositories
     private long repositoryLastSeenId = 0;
     // Repositories by name
     private boolean searchingReposByName = false;
-    private String lastSearchQuery = "";
     private String searchQuery = "";
-    private int currentPage = 0;
 
     @Nullable
     private GitRepositoriesMVP.View view;
@@ -73,7 +63,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
         Log.i(TAG, "onSearchFieldChanges(query= " + query + ")");
 
         if (repositoryItems == null) {
-            //TODO: Important to check this value. Cuando el dispositivo se rota
+            // Important checking this value !!
             Log.w(TAG, "onSearchFieldChanges() called when repository items are not ready. " +
                     "It is because the search edit text calls onTextChanged() when it gets its last text " +
                     "=> User just rotated their pone");
@@ -130,16 +120,6 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
             getDataSubscription.dispose();
         }
 
-        // TODO: Guardar en bundle para recuperar el estado una vez volvamos del detalle
-        Log.i(TAG, "All state variables must be restored as default");
-
-        //   repositoryItems.clear();
-        //   repositoryPosition = 0;
-        //   currentPage = 0;
-        //   repositoryLastSeenId = 0;
-        //   allPagesRetrieved = false;
-        //   searchingReposByName = false;
-        //   searchQuery = "";
     }
 
 
@@ -157,8 +137,6 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
     public void subscribeAndRestoreState(GitRepositoriesMVP.View view, @NonNull GitRepositoriesMVP.State state) {
         Log.i(TAG, "subscribeAndRestoreState(view). Last data will be shown");
         this.view = view;
-
-        this.repositoryItems = new ArrayList<>();
 
         // There are retrieved items, get them from the state
         repositoryItems = state.getRepositoryItems();
@@ -223,7 +201,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                                 Log.e(TAG, "No more pages to retrieve! The previous call was the last one.");
                                 if (view != null) {
                                     view.hideProgress();
-                                    view.showSnackBar("All pages were retrieved");
+                                    view.showAllPagesRetrieved();
                                 }
                                 allPagesRetrieved = true;
                                 loadingPage = false;
@@ -233,12 +211,8 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                             @Override
                             public void onNext(GitRepositoryBasicModel repository) {
                                 Log.i(TAG, "Git repository fetched: " + repository.getName());
-                                try {
-                                    repositoryItems.add(repository);
-                                } catch (Exception e) {
-                                    Log.e(TAG, "Excepcion chunga!! " + e);
-                                    e.printStackTrace();
-                                }
+
+                                repositoryItems.add(repository);
 
                                 if (view != null) {
                                     repositoryLastSeenId = repository.getId();
@@ -252,7 +226,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                                 if (view != null) {
                                     view.removeAllRepositories();
                                     view.hideProgress();
-                                    view.showSnackBar("No public repositories found");
+                                    view.showPublicRepositoriesNotFound();
                                     allPagesRetrieved = true;
                                     loadingPage = false;
                                 }
@@ -263,7 +237,7 @@ public class GitRepositoriesPresenter implements GitRepositoriesMVP.Presenter {
                                 Log.i(TAG, "All repositories fetched from current call");
                                 if (view != null) {
                                     view.hideProgress();
-                                    view.showSnackBar("Repositories fetched successfully!");
+                                    view.showRepositoryPageFetched();
                                     loadingPage = false;
                                 }
                             }

@@ -204,7 +204,21 @@ public class GitRepositoriesActivity extends AppCompatActivity implements GitRep
     }
 
     @Override
-    public void showSnackBar(String message) {
+    public void showAllPagesRetrieved() {
+        showSnackBar(getString(R.string.info_all_pages_retrieved));
+    }
+
+    @Override
+    public void showPublicRepositoriesNotFound() {
+        showSnackBar(getString(R.string.error_public_repositories_not_found));
+    }
+
+    @Override
+    public void showRepositoryPageFetched() {
+        showSnackBar(getString(R.string.info_repository_page_retrieved));
+    }
+
+    private void showSnackBar(String message) {
         Log.i(TAG, "showSnackBar() message = " + message);
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
     }

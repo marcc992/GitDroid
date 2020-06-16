@@ -12,4 +12,7 @@
     <string name="error_network_not_found_user_data">An error occurred fetching user data</string>
     <string name="error_network_not_found_repository_data">An error occurred fetching repository data</string>
     <string name="error_network_not_found_neither_user_repository_data">An error occurred fetching user and repository data</string>
+    <string name="info_all_pages_retrieved">No more data to show</string>
+    <string name="error_public_repositories_not_found">No public repositories found</string>
+    <string name="info_repository_page_retrieved">Repository list refreshed</string>
 </resources>
