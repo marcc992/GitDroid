@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_general_app_description">Cercar repositoris de GitHub mai va ser tan fàcil.\n\nSimplement has de prèmer al botó d\'Obtenir Repos!</string>
+    <string name="button_get_repos">Obtenir Repos!</string>
+    <string name="content_description_image_user_avatar">Fotografia de perfil de l\'usuari de GitHub</string>
+    <string name="text_repository_selected">Repositori:</string>
+    <string name="text_header_all_public_repositories">Repositoris públics</string>
+    <string name="text_owner_is">Propietari:</string>
+    <string name="text_search_query">Cercar:</string>
+    <string name="error_network_not_found_user_data">S\'ha produït un error durant la càrrega de l\'usuari</string>
+    <string name="error_network_not_found_repository_data">S\'ha produït un error durant la càrrega del repositori</string>
+    <string name="error_network_not_found_neither_user_repository_data">S\'ha produït un error durant la càrrega de l\'usuari i del repositori</string>
+    <string name="info_all_pages_retrieved">No hi ha més dades</string>
+    <string name="error_public_repositories_not_found">No s\'han trobat repositoris públics</string>
+    <string name="info_repository_page_retrieved">Llista de repositoris actualitzada</string>
+</resources>

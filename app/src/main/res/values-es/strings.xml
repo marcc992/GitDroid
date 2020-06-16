@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_general_app_description">Buscar repositorios de GitHub nunca fue tan fácil.\n\nSimplemente debes pulsar en el botón de ¡Obtener Repos!</string>
+    <string name="button_get_repos">¡Obtener Repos!</string>
+    <string name="content_description_image_user_avatar">Avatar del usuario de GitHub</string>
+    <string name="text_repository_selected">Repositorio:</string>
+    <string name="text_header_all_public_repositories">Repositorios públicos</string>
+    <string name="text_owner_is">Propietario:</string>
+    <string name="text_search_query">Buscar:</string>
+    <string name="error_network_not_found_user_data">Ocurrió un error durante la carga del usuario</string>
+    <string name="error_network_not_found_repository_data">Ocurrió un error durante la carga del repositorio</string>
+    <string name="error_network_not_found_neither_user_repository_data">Ocurrió un error durante la carga del usuario y del repositorio</string>
+    <string name="info_all_pages_retrieved">No hay más datos</string>
+    <string name="error_public_repositories_not_found">No se encontraron repositorios públicos</string>
+    <string name="info_repository_page_retrieved">Lista de repositorios actualizada</string>
+</resources>
