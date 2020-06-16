@@ -3,6 +3,7 @@
     <string name="text_general_app_description">Buscar repositorios de GitHub nunca fue tan fácil.\n\nSimplemente debes pulsar en el botón de ¡Obtener Repos!</string>
     <string name="button_get_repos">¡Obtener Repos!</string>
     <string name="content_description_image_user_avatar">Avatar del usuario de GitHub</string>
+    <string name="content_description_app_logo">Logo de la aplicación</string>
     <string name="text_repository_selected">Repositorio:</string>
     <string name="text_header_all_public_repositories">Repositorios públicos</string>
     <string name="text_owner_is">Propietario:</string>
